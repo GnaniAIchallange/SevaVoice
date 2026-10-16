@@ -1,122 +1,207 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Admin from "./pages/Admin.jsx";
+import Verifier from "./pages/Verifier.jsx";
+import Donor from "./pages/Donor.jsx";
+import Farmer from "./pages/Farmer.jsx";
+import DonorRegister from "./pages/DonorRegister.jsx";
 
-function App() {
-  const [count, setCount] = useState(0)
+import "./App.css";
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const ROLE_PAGES = {
+  admin: Admin,
+  verifier: Verifier,
+  donor: Donor,
+  farmer: Farmer,
+};
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function readSavedUser() {
+  try {
+    return (
+      JSON.parse(sessionStorage.getItem("seva-auth") || "null")?.user ?? null
+    );
+  } catch {
+    return null;
+  }
 }
 
-export default App
+function App() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [authMode, setAuthMode] = useState("login");
+  const [user, setUser] = useState(readSavedUser);
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleLogin(event) {
+    event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, password }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Unable to sign in");
+      }
+
+      sessionStorage.setItem(
+        "seva-auth",
+        JSON.stringify({ token: result.token, user: result.user }),
+      );
+      setUser(result.user);
+      setPassword("");
+    } catch (loginError) {
+      setError(loginError.message || "Could not connect to the server");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  function handleRegistered(result) {
+    sessionStorage.setItem(
+      "seva-auth",
+      JSON.stringify({ token: result.token, user: result.user }),
+    );
+    setUser(result.user);
+    setPassword("");
+    setShowLogin(false);
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem("seva-auth");
+    setUser(null);
+    setPhone("");
+    setPassword("");
+  }
+
+  return (
+    <div className="app-shell">
+      <header className="topbar">
+        <a className="brand" href="#home" onClick={() => setShowLogin(false)}>
+          SevaVoice
+        </a>
+        <nav aria-label="Main navigation">
+          {user ? (
+            <button className="login-link" type="button" onClick={handleLogout}>
+              Log out
+            </button>
+          ) : (
+            <button
+              className="login-link"
+              type="button"
+              onClick={() => {
+                setShowLogin(true);
+                setAuthMode("login");
+                setError("");
+              }}
+            >
+              Login
+            </button>
+          )}
+        </nav>
+      </header>
+
+      <main>
+        {user ? (
+          (() => {
+            const RolePage = ROLE_PAGES[user.role];
+            return RolePage ? (
+              <RolePage user={user} onLogout={handleLogout} />
+            ) : (
+              <section className="login-panel">
+                <h1>Account role not recognized</h1>
+                <button
+                  className="submit-button"
+                  type="button"
+                  onClick={handleLogout}
+                >
+                  Log out
+                </button>
+              </section>
+            );
+          })()
+        ) : showLogin && authMode === "register" ? (
+          <DonorRegister
+            onBack={() => setShowLogin(false)}
+            onLogin={() => {
+              setAuthMode("login");
+              setError("");
+            }}
+            onRegistered={handleRegistered}
+          />
+        ) : showLogin ? (
+          <section className="login-panel" aria-labelledby="login-title">
+            <button
+              className="back-link"
+              type="button"
+              onClick={() => setShowLogin(false)}
+            >
+              Back
+            </button>
+
+            <p className="eyebrow">SevaVoice account</p>
+            <h1 id="login-title">Login</h1>
+            <form className="login-form" onSubmit={handleLogin}>
+              <label htmlFor="phone">Phone number</label>
+              <input
+                autoComplete="tel"
+                id="phone"
+                name="phone"
+                onChange={(event) => setPhone(event.target.value)}
+                placeholder="Enter your phone number"
+                required
+                type="tel"
+                value={phone}
+              />
+
+              <label htmlFor="password">Password</label>
+              <input
+                autoComplete="current-password"
+                id="password"
+                name="password"
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
+                required
+                type="password"
+                value={password}
+              />
+
+              {error && (
+                <p className="form-error" role="alert">
+                  {error}
+                </p>
+              )}
+
+              <button
+                className="submit-button"
+                disabled={isSubmitting}
+                type="submit"
+              >
+                {isSubmitting ? "Signing in..." : "Login"}
+              </button>
+            </form>
+            <button
+              className="auth-switch"
+              type="button"
+              onClick={() => {
+                setAuthMode("register");
+                setError("");
+              }}
+            >
+              Create a donor account
+            </button>
+          </section>
+        ) : null}
+      </main>
+    </div>
+  );
+}
+
+export default App;
