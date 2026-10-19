@@ -1,19 +1,35 @@
-import { useState } from "react";
-import Admin from "./pages/Admin.jsx";
-import Verifier from "./pages/Verifier.jsx";
-import Donor from "./pages/Donor.jsx";
-import Farmer from "./pages/Farmer.jsx";
-import DonorRegister from "./pages/DonorRegister.jsx";
+import { useCallback, useEffect, useState } from "react";
+import Admin from "./pages/admin/Admin.jsx";
+import Donor from "./pages/donor/Donor.jsx";
+import Farmer from "./pages/farmer/Farmer.jsx";
+import Home from "./pages/home/Home.jsx";
+import Login from "./pages/login/Login.jsx";
+import RegistrationChooser from "./pages/register/RegistrationChooser.jsx";
+import RegisterDonor from "./pages/register/RegisterDonor.jsx";
+import RegisterFarmer from "./pages/register/RegisterFarmer.jsx";
+import Verifier from "./pages/verifier/Verifier.jsx";
+import RouteLink from "./components/RouteLink.jsx";
 
 import "./App.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const ROLE_PAGES = {
   admin: Admin,
   verifier: Verifier,
   donor: Donor,
   farmer: Farmer,
 };
+const PUBLIC_PATHS = [
+  "/",
+  "/login",
+  "/register",
+  "/register/donor",
+  "/register/farmer",
+];
+const ROLE_PATHS = Object.keys(ROLE_PAGES).map((role) => `/${role}`);
+
+function normalizePath(path) {
+  return path.replace(/\/+$/, "") || "/";
+}
 
 function readSavedUser() {
   try {
@@ -26,179 +42,126 @@ function readSavedUser() {
 }
 
 function App() {
-  const [showLogin, setShowLogin] = useState(false);
-  const [authMode, setAuthMode] = useState("login");
+  const [pathname, setPathname] = useState(() =>
+    normalizePath(window.location.pathname),
+  );
   const [user, setUser] = useState(readSavedUser);
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleLogin(event) {
-    event.preventDefault();
-    setError("");
-    setIsSubmitting(true);
+  const navigate = useCallback((path, replace = false) => {
+    const nextPath = normalizePath(path);
+    const method = replace ? "replaceState" : "pushState";
+    window.history[method]({}, "", nextPath);
+    setPathname(nextPath);
+  }, []);
 
-    try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password }),
-      });
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Unable to sign in");
-      }
-
-      sessionStorage.setItem(
-        "seva-auth",
-        JSON.stringify({ token: result.token, user: result.user }),
-      );
-      setUser(result.user);
-      setPassword("");
-    } catch (loginError) {
-      setError(loginError.message || "Could not connect to the server");
-    } finally {
-      setIsSubmitting(false);
+  useEffect(() => {
+    function handlePopState() {
+      setPathname(normalizePath(window.location.pathname));
     }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const RolePage = user ? ROLE_PAGES[user.role] : null;
+  const rolePath = user && RolePage ? `/${user.role}` : null;
+  let resolvedPath = pathname;
+  const isRolePath = ROLE_PATHS.includes(pathname);
+
+  if (!PUBLIC_PATHS.includes(pathname) && !isRolePath) {
+    resolvedPath = "/";
+  } else if (!user && isRolePath) {
+    resolvedPath = "/login";
+  } else if (
+    rolePath &&
+    (PUBLIC_PATHS.includes(pathname) || (isRolePath && pathname !== rolePath))
+  ) {
+    resolvedPath = rolePath;
   }
 
-  function handleRegistered(result) {
+  useEffect(() => {
+    if (pathname !== resolvedPath) {
+      window.history.replaceState({}, "", resolvedPath);
+    }
+  }, [pathname, resolvedPath]);
+
+  function handleAuthenticated(result) {
     sessionStorage.setItem(
       "seva-auth",
       JSON.stringify({ token: result.token, user: result.user }),
     );
     setUser(result.user);
-    setPassword("");
-    setShowLogin(false);
+    if (ROLE_PAGES[result.user.role]) {
+      navigate(`/${result.user.role}`, true);
+    }
   }
 
   function handleLogout() {
     sessionStorage.removeItem("seva-auth");
     setUser(null);
-    setPhone("");
-    setPassword("");
+    navigate("/login", true);
   }
 
   return (
     <div className="app-shell">
       <header className="topbar">
-        <a className="brand" href="#home" onClick={() => setShowLogin(false)}>
+        <RouteLink className="brand" to="/" onNavigate={navigate}>
           SevaVoice
-        </a>
+        </RouteLink>
         <nav aria-label="Main navigation">
           {user ? (
-            <button className="login-link" type="button" onClick={handleLogout}>
-              Log out
-            </button>
+            <>
+              {RolePage && (
+                <RouteLink
+                  className="nav-link"
+                  to={`/${user.role}`}
+                  onNavigate={navigate}
+                >
+                  {user.role} workspace
+                </RouteLink>
+              )}
+              <button className="login-link" type="button" onClick={handleLogout}>
+                Log out
+              </button>
+            </>
           ) : (
-            <button
-              className="login-link"
-              type="button"
-              onClick={() => {
-                setShowLogin(true);
-                setAuthMode("login");
-                setError("");
-              }}
-            >
-              Login
-            </button>
+            <>
+              <RouteLink className="nav-link" to="/login" onNavigate={navigate}>
+                Login
+              </RouteLink>
+              <RouteLink className="nav-register" to="/register" onNavigate={navigate}>
+                Register
+              </RouteLink>
+            </>
           )}
         </nav>
       </header>
 
       <main>
-        {user ? (
-          (() => {
-            const RolePage = ROLE_PAGES[user.role];
-            return RolePage ? (
-              <RolePage user={user} onLogout={handleLogout} />
-            ) : (
-              <section className="login-panel">
-                <h1>Account role not recognized</h1>
-                <button
-                  className="submit-button"
-                  type="button"
-                  onClick={handleLogout}
-                >
-                  Log out
-                </button>
-              </section>
-            );
-          })()
-        ) : showLogin && authMode === "register" ? (
-          <DonorRegister
-            onBack={() => setShowLogin(false)}
-            onLogin={() => {
-              setAuthMode("login");
-              setError("");
-            }}
-            onRegistered={handleRegistered}
-          />
-        ) : showLogin ? (
-          <section className="login-panel" aria-labelledby="login-title">
-            <button
-              className="back-link"
-              type="button"
-              onClick={() => setShowLogin(false)}
-            >
-              Back
-            </button>
-
-            <p className="eyebrow">SevaVoice account</p>
-            <h1 id="login-title">Login</h1>
-            <form className="login-form" onSubmit={handleLogin}>
-              <label htmlFor="phone">Phone number</label>
-              <input
-                autoComplete="tel"
-                id="phone"
-                name="phone"
-                onChange={(event) => setPhone(event.target.value)}
-                placeholder="Enter your phone number"
-                required
-                type="tel"
-                value={phone}
-              />
-
-              <label htmlFor="password">Password</label>
-              <input
-                autoComplete="current-password"
-                id="password"
-                name="password"
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Enter your password"
-                required
-                type="password"
-                value={password}
-              />
-
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
-
-              <button
-                className="submit-button"
-                disabled={isSubmitting}
-                type="submit"
-              >
-                {isSubmitting ? "Signing in..." : "Login"}
-              </button>
-            </form>
-            <button
-              className="auth-switch"
-              type="button"
-              onClick={() => {
-                setAuthMode("register");
-                setError("");
-              }}
-            >
-              Create a donor account
+        {user && !RolePage ? (
+          <section className="login-panel" aria-labelledby="unknown-role-title">
+            <h1 id="unknown-role-title">Account role not recognized</h1>
+            <button className="submit-button" type="button" onClick={handleLogout}>
+              Log out
             </button>
           </section>
-        ) : null}
+        ) : RolePage && ROLE_PATHS.includes(resolvedPath) ? (
+          <RolePage user={user} onLogout={handleLogout} />
+        ) : resolvedPath === "/login" ? (
+          <Login onNavigate={navigate} onAuthenticated={handleAuthenticated} />
+        ) : resolvedPath === "/register" ? (
+          <RegistrationChooser onNavigate={navigate} />
+        ) : resolvedPath === "/register/donor" ? (
+          <RegisterDonor
+            onBack={() => navigate("/")}
+            onLogin={() => navigate("/login")}
+            onRegistered={handleAuthenticated}
+          />
+        ) : resolvedPath === "/register/farmer" ? (
+          <RegisterFarmer onNavigate={navigate} />
+        ) : (
+          <Home onNavigate={navigate} />
+        )}
       </main>
     </div>
   );

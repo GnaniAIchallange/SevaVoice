@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "test": "node --test src/routes/authRoutes.test.js src/routes/farmerRoutes.test.js src/routes/voiceRoutes.test.js src/services/voiceService.test.js"
   },
   "keywords": [],
   "author": "",
@@ -17,8 +18,10 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.8",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.11.2",
+    "multer": "^2.4.0",
     "nodemon": "^3.1.14",
     "zod": "^4.6.7"
   }
