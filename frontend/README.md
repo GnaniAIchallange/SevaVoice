@@ -39,12 +39,20 @@ Page components are grouped by feature under `src/pages`:
 Shared navigation components live in `src/components`; voice recording, API,
 and question configuration code live in `src/lib`.
 
-Farmer registrations are saved as pending farmer profiles. Donor registrations
-create a donor user account and sign the donor in. Farmer registrations do not
-create login credentials; farmers currently have no login path. The backend
-Gnani key is optional; set `GNANI_API_KEY` in `backend/.env` to enable voice
-input and playback. The configured Timbre v2.5 voices are Ishaan (Marathi),
-Nalini (Hindi), and Kaveri (English).
+Farmer registrations are stored in the existing `User` collection with the
+`role` set to `farmer` and a pending verification status. Donor registrations
+create a donor user account and sign the donor in. The backend keeps farmer
+profile fields on the same user record instead of creating a duplicate farmer
+collection. Required Aadhaar and land-certificate files, plus up to five
+optional supporting documents, are saved outside the public web root. Their
+metadata and private storage keys are stored in MongoDB's `documents`
+collection and linked to the farmer user. The private file directory defaults
+to `backend/private-uploads` and can be changed with `PRIVATE_UPLOAD_DIR`.
+Uploads are limited to PDF/JPG/JPEG/PNG, 8 MB per file.
+
+The backend Gnani key is optional; set `GNANI_API_KEY` in
+`backend/.env` to enable voice input and playback. The configured Timbre v2.5
+voices are Ishaan (Marathi), Nalini (Hindi), and Kaveri (English).
 
 Registration APIs are `POST /api/farmers/register` and
 `POST /api/auth/register/donor`. Both validate request fields server-side and

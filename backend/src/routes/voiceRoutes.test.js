@@ -196,7 +196,7 @@ test("application mounts registration and voice routes without a Gnani key", asy
     });
     assert.equal(farmer.status, 400);
     assert.deepEqual(await farmer.json(), {
-      message: "Check the farmer registration details",
+      message: "Upload both the Aadhaar card and land ownership certificate",
     });
 
     const response = await fetch(

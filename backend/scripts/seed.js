@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { env } from '../src/config/env.js';
 import { connectDB } from '../src/config/db.js';
-import { User, FarmerProfile } from '../src/models/index.js';
+import { User } from '../src/models/index.js';
 import { ROLES } from '../src/utils/constants.js';
 
 // Dev-only password for every seeded account
@@ -57,21 +57,12 @@ async function seed() {
   const phones = all.map((u) => u.phone);
   const old = await User.find({ phone: { $in: phones } }).select('_id');
   const oldIds = old.map((u) => u._id);
-  await FarmerProfile.deleteMany({ userId: { $in: oldIds } });
   await User.deleteMany({ _id: { $in: oldIds } });
 
-  // Create users
   const created = [];
   for (const { profile, ...userData } of all) {
-    const user = await User.create({ ...userData, passwordHash });
-    created.push({ user, profile });
-  }
-
-  // Create a (pending) profile for each farmer
-  for (const { user, profile } of created) {
-    if (user.role === ROLES.FARMER) {
-      await FarmerProfile.create({ userId: user._id, ...profile });
-    }
+    const user = await User.create({ ...userData, ...profile, passwordHash });
+    created.push(user);
   }
 
   console.log(`Seeded ${created.length} users:`);

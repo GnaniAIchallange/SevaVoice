@@ -139,6 +139,23 @@ async function completeTypedAnswers(page, answers, actions) {
   }
 }
 
+async function completeDocumentSubmission(page) {
+  const pdf = Buffer.from("%PDF-1.4\nbrowser test");
+  await page.locator("#aadhaar-document").setInputFiles({
+    name: "aadhaar.pdf",
+    mimeType: "application/pdf",
+    buffer: pdf,
+  });
+  await page.locator("#land-document").setInputFiles({
+    name: "land.pdf",
+    mimeType: "application/pdf",
+    buffer: pdf,
+  });
+  await page.locator("#farmer-password").fill("safe-test-password");
+  await page.locator("#farmer-confirm-password").fill("safe-test-password");
+  await page.getByRole("button", { name: "Submit for verification" }).click();
+}
+
 before(async () => {
   const viteEntry = path.join(
     frontendRoot,
@@ -322,11 +339,14 @@ for (const language of [
     const mocks = await installVoiceMocks(page, transcripts);
     let registration;
     await page.route("**/api/farmers/register", async (route) => {
-      registration = route.request().postDataJSON();
+      registration = route.request().postDataBuffer().toString("latin1");
       await route.fulfill({
         status: 201,
         contentType: "application/json",
-        body: JSON.stringify({ farmer: { verificationStatus: "pending" } }),
+        body: JSON.stringify({
+          farmer: { verificationStatus: "pending" },
+          message: "Registration and documents submitted. Your account is awaiting verification.",
+        }),
       });
     });
     await page.addInitScript(() => {
@@ -385,26 +405,50 @@ for (const language of [
       await confirmCurrentAnswer(page, language.actions);
     }
 
-    await page
-      .getByRole("heading", { name: language.completeTitle })
-      .waitFor();
+    await page.getByRole("heading", { name: "Upload required documents" }).waitFor();
+    assert.ok(
+      mocks.ttsRequests.some((request) =>
+        request.text.includes(
+          language.code === "en-IN"
+            ? "upload your Aadhaar card"
+            : language.code === "mr-IN"
+              ? "आधार कार्ड"
+              : "आधार कार्ड",
+        ),
+      ),
+      "the document instructions are spoken in the selected language",
+    );
+    if (language.code === "en-IN") {
+      transcripts.push("I need help with the documents");
+      await page.getByRole("button", { name: "Speak for document help" }).waitFor();
+      await captureAnswer(page, {
+        start: "Speak for document help",
+        stop: "Stop listening",
+      });
+      await page.getByRole("status").waitFor();
+      assert.match(
+        await page.getByRole("status").innerText(),
+        /I heard: I need help with the documents/,
+      );
+      await page.getByRole("button", { name: "Submit for verification" }).waitFor();
+    }
+    await completeDocumentSubmission(page);
+    await page.getByRole("heading", { name: language.completeTitle }).waitFor();
     assert.ok(
       (await page.locator("main").innerText()).includes(language.doneText),
     );
-    assert.deepEqual(registration, {
-      fullName: language.values[2],
-      mobileNumber: "9876543210",
-      village: language.values[5],
-      district: language.values[6],
-      state: language.values[7],
-      landSizeAcres: 1.5,
-      cropType: language.values[9],
-      preferredLanguage: language.code,
-    });
+    assert.match(registration, /name="fullName"/);
+    assert.match(registration, /name="mobileNumber"/);
+    assert.match(registration, /name="aadhaarDocument"; filename="aadhaar\.pdf"/);
+    assert.match(registration, /name="landDocument"; filename="land\.pdf"/);
+    assert.match(registration, /name="password"/);
     await page.getByRole("button", { name: language.loginLabel }).click();
     await page.waitForURL("**/login");
     assert.equal(transcripts.length, 0);
-    assert.equal(mocks.audioFiles.length, language.values.length);
+    assert.equal(
+      mocks.audioFiles.length,
+      language.values.length + Number(language.code === "en-IN"),
+    );
     assert.ok(mocks.audioFiles.every((file) => file.trackState === "ended"));
     assert.ok(mocks.audioFiles.every((file) => file.size > 1000));
     assert.ok(
@@ -529,6 +573,7 @@ test("shows farmer duplicate and network errors without a false success state", 
   await clickByName(duplicatePage, "English");
   await duplicatePage.getByRole("button", { name: actions.start }).waitFor();
   await completeTypedAnswers(duplicatePage, answers, actions);
+  await completeDocumentSubmission(duplicatePage);
   await duplicatePage.getByRole("status").waitFor();
   assert.match(
     await duplicatePage.getByRole("status").innerText(),
@@ -550,6 +595,7 @@ test("shows farmer duplicate and network errors without a false success state", 
   await clickByName(networkPage, "English");
   await networkPage.getByRole("button", { name: actions.start }).waitFor();
   await completeTypedAnswers(networkPage, answers, actions);
+  await completeDocumentSubmission(networkPage);
   await networkPage.getByRole("status").waitFor();
   assert.match(
     await networkPage.getByRole("status").innerText(),

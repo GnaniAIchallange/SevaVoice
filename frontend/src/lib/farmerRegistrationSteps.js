@@ -12,6 +12,14 @@ export const FARMER_REGISTRATION_LANGUAGES = {
   "mr-IN": {
     name: "मराठी",
     intro: "सेवावॉइसमध्ये आपले स्वागत आहे. आपण एकेक प्रश्नाचे उत्तर देऊ शकता.",
+    documentGuide:
+      "आता आधार कार्ड आणि जमिनीचा मालकी दाखला अपलोड करा. तुम्हाला हवे असल्यास अतिरिक्त कागदपत्रेही जोडू शकता. कागदपत्रे फक्त निवडून अपलोड करा; ती बोलून सांगू नका.",
+    documentListenPrompt:
+      "तुम्हाला कागदपत्रांबद्दल काय मदत हवी आहे ते सांगा. मी आवश्यक कागदपत्रे पुन्हा सांगीन.",
+    documentHeardPrefix: "तुम्ही सांगितले",
+    documentListen: "मदत मागण्यासाठी बोला",
+    documentStop: "ऐकणे थांबवा",
+    documentListening: "ऐकत आहे...",
     retry: "मला उत्तर समजले नाही. कृपया पुन्हा सांगा किंवा टाइप करा.",
     confirmPrefix: "तुम्ही सांगितले",
     confirmQuestion: "हे बरोबर आहे का?",
@@ -61,6 +69,14 @@ export const FARMER_REGISTRATION_LANGUAGES = {
   "hi-IN": {
     name: "हिंदी",
     intro: "सेवावॉइस में आपका स्वागत है। आप एक-एक सवाल का जवाब दे सकते हैं।",
+    documentGuide:
+      "अब आधार कार्ड और भूमि स्वामित्व प्रमाणपत्र अपलोड करें। चाहें तो अतिरिक्त दस्तावेज़ भी जोड़ें। दस्तावेज़ चुनकर अपलोड करें; उनकी जानकारी बोलकर न बताएं।",
+    documentListenPrompt:
+      "दस्तावेज़ों के बारे में आपको किस मदद की ज़रूरत है, बताएं। मैं आवश्यक दस्तावेज़ फिर से बताऊँगा।",
+    documentHeardPrefix: "आपने कहा",
+    documentListen: "मदद के लिए बोलें",
+    documentStop: "सुनना बंद करें",
+    documentListening: "सुन रहा है...",
     retry: "मुझे जवाब समझ नहीं आया। कृपया फिर से बोलें या टाइप करें।",
     confirmPrefix: "आपने कहा",
     confirmQuestion: "क्या यह सही है?",
@@ -110,6 +126,14 @@ export const FARMER_REGISTRATION_LANGUAGES = {
   "en-IN": {
     name: "English",
     intro: "Welcome to SevaVoice. I will ask one question at a time.",
+    documentGuide:
+      "Now upload your Aadhaar card and land ownership certificate. You may also add supporting documents. Select and upload the files; do not speak document details aloud.",
+    documentListenPrompt:
+      "Tell me what help you need with the documents. I will repeat which documents are required.",
+    documentHeardPrefix: "I heard",
+    documentListen: "Speak for document help",
+    documentStop: "Stop listening",
+    documentListening: "Listening...",
     retry: "I could not understand that. Please say it again or type your answer.",
     confirmPrefix: "You said",
     confirmQuestion: "Is that correct?",

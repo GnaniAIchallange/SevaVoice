@@ -6,7 +6,6 @@ const documentSchema = new mongoose.Schema(
     ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     type: { type: String, enum: DOCUMENT_TYPES, required: true },
     storageKey: { type: String, required: true },
-    originalName: { type: String, trim: true },
     mimeType: { type: String, required: true },
     size: { type: Number, required: true },
 

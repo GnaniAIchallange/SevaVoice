@@ -21,7 +21,10 @@ export const REQUEST_STATUS = Object.freeze({
 
 export const DOCUMENT_TYPES = Object.freeze([
   'identity',
+  'aadhaar',
   'land_record',
+  'land_certificate',
+  'supporting',
   'bank_passbook',
   'other',
 ]);
