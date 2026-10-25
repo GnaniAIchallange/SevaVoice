@@ -14,9 +14,12 @@ export const VERIFICATION_STATUS = Object.freeze({
 export const REQUEST_STATUS = Object.freeze({
   DRAFT: 'draft',
   SUBMITTED: 'submitted',
+  UNDER_REVIEW: 'under_review',
+  ADDITIONAL_INFO_REQUIRED: 'additional_info_required',
   APPROVED: 'approved',
   REJECTED: 'rejected',
   FUNDED: 'funded',
+  CLOSED: 'closed',
 });
 
 export const DOCUMENT_TYPES = Object.freeze([
@@ -43,6 +46,7 @@ export const DOCUMENT_STATUS = Object.freeze({
   PENDING: 'pending',
   VERIFIED: 'verified',
   REJECTED: 'rejected',
+  NEEDS_REPLACEMENT: 'needs_replacement',
 });
 
 export const LANGUAGES = Object.freeze(['en', 'hi', 'mr']);

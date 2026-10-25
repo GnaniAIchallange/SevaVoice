@@ -4,6 +4,8 @@ import authRoutes from "./routes/authRoutes.js";
 import farmerRoutes from "./routes/farmerRoutes.js";
 import farmerWorkspaceRoutes from "./routes/farmerWorkspaceRoutes.js";
 import voiceRoutes from "./routes/voiceRoutes.js";
+import verifierRoutes from "./routes/verifierRoutes.js";
+import donorRoutes from "./routes/donorRoutes.js";
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/farmers", farmerRoutes);
 app.use("/api/farmer", farmerWorkspaceRoutes);
 app.use("/api/voice", voiceRoutes);
+app.use("/api/verifier", verifierRoutes);
+app.use("/api/donor", donorRoutes);
 
 app.use((error, _req, res, _next) => {
   if (error.status >= 400 && error.status < 500) {

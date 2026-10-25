@@ -17,6 +17,7 @@ const documentSchema = new mongoose.Schema(
     verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     verifiedAt: { type: Date },
     rejectionReason: { type: String, trim: true },
+    remarks: { type: String, trim: true },
 
     // Set when the farmer uploads a new file to replace a rejected one
     replacedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
