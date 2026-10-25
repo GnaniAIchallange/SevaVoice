@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "test": "node --test src/lib/farmerRegistrationSteps.test.js",
+    "test": "node --test src/lib/farmerRegistrationSteps.test.js src/pages/farmer/farmerStrings.test.js",
     "test:browser": "node --test scripts/voiceBrowser.test.js",
     "preview": "vite preview"
   },

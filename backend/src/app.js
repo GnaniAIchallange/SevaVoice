@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import farmerRoutes from "./routes/farmerRoutes.js";
+import farmerWorkspaceRoutes from "./routes/farmerWorkspaceRoutes.js";
 import voiceRoutes from "./routes/voiceRoutes.js";
 import verifierRoutes from "./routes/verifierRoutes.js";
 import donorRoutes from "./routes/donorRoutes.js";
@@ -17,6 +18,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/farmers", farmerRoutes);
+app.use("/api/farmer", farmerWorkspaceRoutes);
 app.use("/api/voice", voiceRoutes);
 app.use("/api/verifier", verifierRoutes);
 app.use("/api/donor", donorRoutes);
