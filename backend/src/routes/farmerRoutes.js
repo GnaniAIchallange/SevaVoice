@@ -8,6 +8,7 @@ import multer from 'multer';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { Document, User } from '../models/index.js';
+import FarmerRegistration from '../models/FarmerRegistration.js';
 import { DOCUMENT_STATUS, ROLES } from '../utils/constants.js';
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
@@ -48,6 +49,18 @@ const farmerRegistrationSchema = z.strictObject({
     .refine((password) => Buffer.byteLength(password, 'utf8') <= 72),
   farmerRegistrationKey: z.string().uuid(),
 });
+
+const voiceRegistrationSchema = z.strictObject({
+  fullName: z.string().trim().min(2).max(100),
+  mobileNumber: z.string().trim().regex(/^[6-9]\d{9}$/),
+  village: z.string().trim().min(1).max(100),
+  district: z.string().trim().min(1).max(100),
+  state: z.string().trim().min(1).max(100),
+  landSizeAcres: acresSchema,
+  cropType: z.string().trim().min(1).max(100),
+  preferredLanguage: z.enum(['mr-IN', 'hi-IN', 'en-IN']),
+});
+const voiceRegistrationFields = new Set(Object.keys(voiceRegistrationSchema.shape));
 
 function isSupportedFile(file) {
   const extension = path.extname(file.originalname).toLowerCase();
@@ -185,6 +198,7 @@ function normalizeLanguage(language) {
 export function createFarmerRouter({
   UserModel = User,
   DocumentModel = Document,
+  FarmerRegistrationModel = FarmerRegistration,
   registrationLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 10,
@@ -200,10 +214,43 @@ export function createFarmerRouter({
 
   router.post('/register', registrationLimiter, upload, async (req, res) => {
     const files = getUploadedFiles(req.files);
+    const voiceOnlyRequest =
+      req.is('application/json') &&
+      Object.keys(req.body ?? {}).some((key) => voiceRegistrationFields.has(key));
     let farmer;
     const createdDocuments = [];
 
     try {
+      if (voiceOnlyRequest) {
+        const result = voiceRegistrationSchema.safeParse(req.body);
+        if (!result.success) {
+          return res.status(400).json({
+            message: 'Check the farmer registration details',
+          });
+        }
+
+        const registration = await FarmerRegistrationModel.create({
+          ...result.data,
+          verificationStatus: 'pending',
+        });
+        return res.status(201).json({
+          farmer: {
+            id: String(registration.id ?? registration._id),
+            fullName: registration.fullName,
+            mobileNumber: registration.mobileNumber,
+            village: registration.village,
+            district: registration.district,
+            state: registration.state,
+            landSizeAcres: registration.landSizeAcres,
+            cropType: registration.cropType,
+            preferredLanguage: registration.preferredLanguage,
+            verificationStatus: registration.verificationStatus,
+            createdAt: registration.createdAt,
+            updatedAt: registration.updatedAt,
+          },
+        });
+      }
+
       if (!req.files?.aadhaarDocument?.length || !req.files?.landDocument?.length) {
         await removeFiles(files);
         return res.status(400).json({
@@ -311,7 +358,9 @@ export function createFarmerRouter({
 
       if (error.code === 11000) {
         return res.status(409).json({
-          message: 'This number or email is already registered',
+          message: voiceOnlyRequest
+            ? 'This number is already registered'
+            : 'This number or email is already registered',
         });
       }
       if (error.name === 'ValidationError') {
@@ -321,7 +370,9 @@ export function createFarmerRouter({
       }
 
       return res.status(500).json({
-        message: 'Unable to save farmer registration and documents',
+        message: voiceOnlyRequest
+          ? 'Unable to save farmer registration'
+          : 'Unable to save farmer registration and documents',
       });
     }
   });

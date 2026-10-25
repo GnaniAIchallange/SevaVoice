@@ -1,9 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  AlertCircle,
+  ArrowRight,
+  Check,
+  Loader2,
+  Map,
+  MapPin,
+  Mic,
+  Phone,
+  Ruler,
+  Sprout,
+  Square,
+  User,
+  Volume2,
+  VolumeX,
+  Wheat,
+  Languages,
+} from "lucide-react";
 import RouteLink from "../../components/RouteLink.jsx";
 import {
   FARMER_REGISTRATION_FIELDS,
   FARMER_REGISTRATION_LANGUAGES,
+  getFarmerValidationMessage,
   normalize,
+  phoneDigitCount,
   phoneReadback,
   validateFarmerAnswer,
 } from "../../lib/farmerRegistrationSteps.js";
@@ -11,6 +31,24 @@ import { createVoiceApi } from "../../lib/voiceApi.js";
 import { createVoiceRecorder } from "../../lib/voiceRecorder.js";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const VOICE_PREFERENCE_KEY = "sevavoice.voiceGuide";
+const FIELD_ICONS = {
+  name: User,
+  phone: Phone,
+  village: MapPin,
+  district: Map,
+  state: Map,
+  acres: Ruler,
+  crop: Wheat,
+};
+
+function loadVoicePreference() {
+  try {
+    return window.localStorage.getItem(VOICE_PREFERENCE_KEY) !== "off";
+  } catch {
+    return true;
+  }
+}
 
 function RegisterFarmer({ onNavigate }) {
   const [language, setLanguage] = useState(null);
@@ -19,7 +57,9 @@ function RegisterFarmer({ onNavigate }) {
   const [answers, setAnswers] = useState({});
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
-  const [readbackReady, setReadbackReady] = useState(false);
+  const [answerSource, setAnswerSource] = useState(null);
+  const [validationErrorCode, setValidationErrorCode] = useState(null);
+  const [voiceGuideEnabled, setVoiceGuideEnabled] = useState(loadVoicePreference);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documentFiles, setDocumentFiles] = useState({
     aadhaarDocument: null,
@@ -36,17 +76,15 @@ function RegisterFarmer({ onNavigate }) {
   const mountedRef = useRef(true);
   const phaseRef = useRef("language");
   const operationRef = useRef(0);
-  const answerVersionRef = useRef(0);
+  const advanceLockRef = useRef(false);
+  const lastSpokenErrorRef = useRef(null);
+  const voiceGuideRef = useRef(voiceGuideEnabled);
   const voiceApi = useMemo(() => createVoiceApi(), []);
   const languageConfig = language
     ? FARMER_REGISTRATION_LANGUAGES[language]
     : null;
   const field = FARMER_REGISTRATION_FIELDS[stepIndex];
   const step = languageConfig?.steps[field];
-  const isBusy = ["speaking", "requesting", "recording", "transcribing"].includes(
-    phase,
-  );
-
   function changePhase(nextPhase) {
     phaseRef.current = nextPhase;
     if (mountedRef.current) {
@@ -65,24 +103,52 @@ function RegisterFarmer({ onNavigate }) {
     };
   }, [voiceApi]);
 
-  async function playQuestion(currentLanguage, operation) {
-    const config = FARMER_REGISTRATION_LANGUAGES[currentLanguage];
-    const currentField = FARMER_REGISTRATION_FIELDS[stepIndex];
-
+  async function playSpeech(
+    text,
+    { automatic = true, languageOverride = language } = {},
+  ) {
+    if (
+      !languageOverride ||
+      (automatic &&
+        (!voiceGuideRef.current ||
+          ["requesting", "recording"].includes(phaseRef.current)))
+    ) {
+      return false;
+    }
     try {
-      await voiceApi.speak(
-        audioRef.current,
-        currentLanguage,
-        config.steps[currentField].prompt,
+      await voiceApi.speak(audioRef.current, languageOverride, text);
+      return true;
+    } catch (error) {
+      if (
+        mountedRef.current &&
+        error.name !== "AbortError" &&
+        languageOverride
+      ) {
+        setStatus(
+          FARMER_REGISTRATION_LANGUAGES[languageOverride].actions.voiceFallback,
+        );
+      }
+      return false;
+    }
+  }
+
+  function toggleVoiceGuide() {
+    const nextEnabled = !voiceGuideRef.current;
+    voiceGuideRef.current = nextEnabled;
+    setVoiceGuideEnabled(nextEnabled);
+    try {
+      window.localStorage.setItem(
+        VOICE_PREFERENCE_KEY,
+        nextEnabled ? "on" : "off",
       );
     } catch {
-      if (mountedRef.current && operationRef.current === operation) {
-        setStatus(config.actions.voiceFallback);
-      }
+      // Storage may be disabled by the browser.
     }
-
-    if (mountedRef.current && operationRef.current === operation) {
-      changePhase("ready");
+    if (!nextEnabled) {
+      voiceApi.stop(audioRef.current);
+      if (phaseRef.current === "speaking") {
+        changePhase("ready");
+      }
     }
   }
 
@@ -93,24 +159,28 @@ function RegisterFarmer({ onNavigate }) {
 
     const operation = operationRef.current + 1;
     operationRef.current = operation;
+    voiceApi.stop(audioRef.current);
     setLanguage(selectedLanguage);
     setStatus("");
     changePhase("speaking");
 
     const config = FARMER_REGISTRATION_LANGUAGES[selectedLanguage];
-    try {
-      await voiceApi.speak(audioRef.current, selectedLanguage, config.intro);
-      if (!mountedRef.current || operationRef.current !== operation) {
-        return;
+    if (voiceGuideRef.current) {
+      try {
+        await voiceApi.speak(audioRef.current, selectedLanguage, config.intro);
+      } catch (error) {
+        if (error.name !== "AbortError" && mountedRef.current) {
+          setStatus(config.actions.voiceFallback);
+        }
       }
-      await voiceApi.speak(
-        audioRef.current,
-        selectedLanguage,
-        config.steps[FARMER_REGISTRATION_FIELDS[0]].prompt,
-      );
-    } catch {
-      if (mountedRef.current && operationRef.current === operation) {
-        setStatus(config.actions.voiceFallback);
+      if (
+        mountedRef.current &&
+        operationRef.current === operation &&
+        voiceGuideRef.current
+      ) {
+        await playSpeech(config.steps[FARMER_REGISTRATION_FIELDS[0]].prompt, {
+          languageOverride: selectedLanguage,
+        });
       }
     }
 
@@ -119,84 +189,30 @@ function RegisterFarmer({ onNavigate }) {
     }
   }
 
-  function replayQuestion() {
-    if (!language || isBusy || phaseRef.current === "done") {
-      return;
-    }
-
-    const operation = operationRef.current + 1;
-    operationRef.current = operation;
-    setStatus("");
-    changePhase("speaking");
-    void playQuestion(language, operation);
-  }
-
-  async function repeatAfter(message) {
+  function listenTo(text) {
     if (!language) {
       return;
     }
-
-    const operation = operationRef.current + 1;
-    operationRef.current = operation;
-    setValue("");
-    answerVersionRef.current += 1;
-    setReadbackReady(false);
-    changePhase("speaking");
-
-    try {
-      await voiceApi.speak(audioRef.current, language, message);
-      if (!mountedRef.current || operationRef.current !== operation) {
-        return;
-      }
-    } catch {
-      if (mountedRef.current && operationRef.current === operation) {
-        setStatus(FARMER_REGISTRATION_LANGUAGES[language].actions.voiceFallback);
-      }
-    }
-
-    if (mountedRef.current && operationRef.current === operation) {
-      await playQuestion(language, operation);
-    }
-  }
-
-  async function readBackAnswer(answer, operation) {
-    const config = FARMER_REGISTRATION_LANGUAGES[language];
-    const answerVersion = answerVersionRef.current;
-    const spokenAnswer =
-      field === "phone" ? phoneReadback(answer, language) : answer;
-    const confirmation = `${config.confirmPrefix}: ${spokenAnswer}. ${config.confirmQuestion}`;
-
-    changePhase("confirming");
-    setReadbackReady(false);
-    try {
-      await voiceApi.speak(audioRef.current, language, confirmation);
-    } catch {
-      if (mountedRef.current && operationRef.current === operation) {
-        setStatus(
-          FARMER_REGISTRATION_LANGUAGES[language].actions.readbackFallback,
-        );
-      }
-    }
-
-    if (
-      mountedRef.current &&
-      operationRef.current === operation &&
-      answerVersionRef.current === answerVersion
-    ) {
-      setReadbackReady(true);
-    }
+    void playSpeech(text, { automatic: false });
   }
 
   async function startRecording() {
-    if (!language || !["ready", "confirming"].includes(phaseRef.current)) {
+    if (
+      !language ||
+      isSubmitting ||
+      ["requesting", "recording", "transcribing", "documents", "done"].includes(
+        phaseRef.current,
+      )
+    ) {
       return;
     }
 
     voiceApi.stop(audioRef.current);
     setStatus("");
-    answerVersionRef.current += 1;
+    setAnswerSource(null);
+    setValidationErrorCode(null);
+    lastSpokenErrorRef.current = null;
     setValue("");
-    setReadbackReady(false);
     const operation = operationRef.current + 1;
     operationRef.current = operation;
     changePhase("requesting");
@@ -229,14 +245,18 @@ function RegisterFarmer({ onNavigate }) {
       }
 
       if (!transcript) {
-        setStatus(languageConfig.retry);
-        await repeatAfter(languageConfig.retry);
+        setStatus(languageConfig.actions.emptyTranscript);
+        changePhase("ready");
         return;
       }
 
       setValue(transcript);
+      setAnswerSource("voice");
       setStatus("");
-      await readBackAnswer(transcript, operation);
+      changePhase("ready");
+      const spokenAnswer =
+        field === "phone" ? phoneReadback(transcript, language) : transcript;
+      await playSpeech(`${languageConfig.confirmPrefix}: ${spokenAnswer}`);
     } catch (error) {
       if (!mountedRef.current || operationRef.current !== operation) {
         return;
@@ -244,7 +264,9 @@ function RegisterFarmer({ onNavigate }) {
 
       recorderRef.current = null;
       if (error.name === "AbortError") {
-        changePhase("ready");
+        if (["requesting", "recording", "transcribing"].includes(phaseRef.current)) {
+          changePhase("ready");
+        }
         return;
       }
 
@@ -255,6 +277,10 @@ function RegisterFarmer({ onNavigate }) {
           : actions.micFallback,
       );
       changePhase("ready");
+    } finally {
+      if (operationRef.current === operation) {
+        recorderRef.current = null;
+      }
     }
   }
 
@@ -267,81 +293,95 @@ function RegisterFarmer({ onNavigate }) {
   }
 
   function handleValueChange(event) {
-    answerVersionRef.current += 1;
     setValue(event.target.value);
-    if (phaseRef.current === "confirming") {
-      setReadbackReady(false);
+    setAnswerSource("typed");
+    setValidationErrorCode(null);
+    lastSpokenErrorRef.current = null;
+    setStatus("");
+  }
+
+  async function speakValidationError(code) {
+    if (!language) {
+      return;
+    }
+    const message = getFarmerValidationMessage(code, language, {
+      digits: phoneDigitCount(value),
+      min: field === "name" ? 2 : 1,
+    });
+    if (message) {
+      await playSpeech(message.spoken);
     }
   }
 
-  async function reviewTypedAnswer() {
-    if (!value.trim() || !["ready", "confirming"].includes(phaseRef.current)) {
+  function showServerFieldError(answerField, code) {
+    const index = FARMER_REGISTRATION_FIELDS.indexOf(answerField);
+    if (index === -1 || !language) {
+      return false;
+    }
+
+    setStepIndex(index);
+    setValue(answers[answerField] ?? "");
+    setAnswerSource("typed");
+    setValidationErrorCode(code);
+    setStatus("");
+    changePhase("ready");
+    lastSpokenErrorRef.current = code;
+    void speakValidationError(code);
+    return true;
+  }
+
+  async function proceedToNextStep() {
+    if (!language || advanceLockRef.current || isSubmitting) {
       return;
     }
 
+    advanceLockRef.current = true;
     const operation = operationRef.current + 1;
     operationRef.current = operation;
+    voiceApi.stop(audioRef.current);
     setStatus("");
-    await readBackAnswer(value.trim(), operation);
-  }
-
-  async function acceptAnswer() {
-    if (phaseRef.current !== "confirming" || !readbackReady) {
-      return;
-    }
 
     const validationError = validateFarmerAnswer(field, value);
     if (validationError) {
-      const message =
-        validationError === "phone"
-          ? languageConfig.invalidPhone
-          : validationError === "acres"
-            ? languageConfig.invalidAcres
-            : languageConfig.retry;
-      setStatus(message);
-      await repeatAfter(message);
+      setValidationErrorCode(validationError);
+      if (lastSpokenErrorRef.current !== validationError) {
+        lastSpokenErrorRef.current = validationError;
+        await speakValidationError(validationError);
+      }
+      advanceLockRef.current = false;
       return;
     }
 
     const normalized = normalize(field, value);
     const completedAnswers = { ...answers, [field]: normalized };
+    setAnswers(completedAnswers);
+    setValidationErrorCode(null);
+    setAnswerSource(null);
+    setValue("");
 
     if (stepIndex === FARMER_REGISTRATION_FIELDS.length - 1) {
-      setAnswers(completedAnswers);
-      setStatus("");
       changePhase("documents");
-      void speakDocumentGuide();
+      void speakDocumentGuide(true);
+      advanceLockRef.current = false;
       return;
     }
 
-    setAnswers(completedAnswers);
     const nextIndex = stepIndex + 1;
     setStepIndex(nextIndex);
-    answerVersionRef.current += 1;
-    setValue("");
-    setReadbackReady(false);
-    const operation = operationRef.current + 1;
-    operationRef.current = operation;
-    setStatus("");
     changePhase("speaking");
     try {
-      await voiceApi.speak(
-        audioRef.current,
-        language,
+      await playSpeech(
         languageConfig.steps[FARMER_REGISTRATION_FIELDS[nextIndex]].prompt,
       );
-    } catch {
+    } finally {
       if (mountedRef.current && operationRef.current === operation) {
-        setStatus(languageConfig.actions.voiceFallback);
+        changePhase("ready");
       }
-    }
-
-    if (mountedRef.current && operationRef.current === operation) {
-      changePhase("ready");
+      advanceLockRef.current = false;
     }
   }
 
-  async function speakDocumentGuide() {
+  async function speakDocumentGuide(automatic = false) {
     if (!language || phaseRef.current !== "documents") {
       return;
     }
@@ -351,10 +391,9 @@ function RegisterFarmer({ onNavigate }) {
     setDocumentVoicePhase("speaking");
     setDocumentVoiceStatus("");
     try {
-      await voiceApi.speak(
-        audioRef.current,
-        language,
+      await playSpeech(
         FARMER_REGISTRATION_LANGUAGES[language].documentGuide,
+        { automatic },
       );
     } catch {
       if (mountedRef.current && operationRef.current === operation) {
@@ -423,11 +462,7 @@ function RegisterFarmer({ onNavigate }) {
       );
       setDocumentVoicePhase("speaking");
       try {
-        await voiceApi.speak(
-          audioRef.current,
-          language,
-          languageConfig.documentGuide,
-        );
+        await playSpeech(languageConfig.documentGuide);
       } catch {
         if (mountedRef.current && operationRef.current === operation) {
           setDocumentVoiceStatus(languageConfig.actions.voiceFallback);
@@ -527,11 +562,35 @@ function RegisterFarmer({ onNavigate }) {
       });
       const result = await response.json();
       if (!response.ok) {
-        setStatus(
-          response.status === 409
-            ? languageConfig.duplicatePhone
-            : result.message || languageConfig.saveFailed,
-        );
+        if (response.status === 409) {
+          showServerFieldError("phone", "duplicate");
+        } else if (response.status === 400) {
+          const fieldErrors = result.fieldErrors ?? result.errors;
+          const serverField =
+            result.field ??
+            (fieldErrors && typeof fieldErrors === "object"
+              ? Object.keys(fieldErrors)[0]
+              : null);
+          const fieldMap = {
+            fullName: "name",
+            name: "name",
+            mobileNumber: "phone",
+            phone: "phone",
+            village: "village",
+            district: "district",
+            state: "state",
+            landSizeAcres: "acres",
+            acres: "acres",
+            cropType: "crop",
+            crop: "crop",
+          };
+          const answerField = fieldMap[serverField];
+          if (!answerField || !showServerFieldError(answerField, "server_invalid")) {
+            setStatus(result.message || languageConfig.invalidDetails);
+          }
+        } else {
+          setStatus(result.message || languageConfig.saveFailed);
+        }
         return;
       }
 
@@ -552,31 +611,43 @@ function RegisterFarmer({ onNavigate }) {
     }
 
     if (mountedRef.current && operationRef.current === operation) {
-      try {
-        await voiceApi.speak(audioRef.current, language, languageConfig.done);
-      } catch {
-        if (mountedRef.current && operationRef.current === operation) {
-          setStatus(languageConfig.actions.voiceFallback);
-        }
-      }
+      await playSpeech(languageConfig.done);
     }
-  }
-
-  function rejectAnswer() {
-    if (phaseRef.current !== "confirming") {
-      return;
-    }
-    void repeatAfter(languageConfig.retry);
   }
 
   const actions = languageConfig?.actions;
   const microphoneLabel =
     phase === "recording"
-      ? actions?.stop || "Stop listening"
+      ? actions?.stopRecording || "Stop recording"
       : phase === "requesting"
-        ? actions?.requesting || "Starting microphone..."
-        : actions?.start || "Start speaking";
+        ? actions?.startingMic || "Starting microphone"
+        : actions?.speakAnswer || "Speak your answer";
   const isDocumentVoiceBusy = documentVoicePhase !== "idle";
+  const validationMessage = validationErrorCode
+    ? getFarmerValidationMessage(validationErrorCode, language, {
+        digits: phoneDigitCount(value),
+        min: field === "name" ? 2 : 1,
+      })
+    : null;
+  const phoneDigits = field === "phone" ? phoneDigitCount(value) : 0;
+  const FieldIcon = FIELD_ICONS[field] ?? Sprout;
+  const voiceToggle = (
+    <button
+      aria-label={voiceGuideEnabled ? "Voice On" : "Voice Off"}
+      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-emerald-900 px-4 py-2 font-bold text-emerald-950 hover:bg-emerald-50"
+      onClick={toggleVoiceGuide}
+      type="button"
+    >
+      {voiceGuideEnabled ? (
+        <Volume2 aria-hidden="true" size={22} />
+      ) : (
+        <VolumeX aria-hidden="true" size={22} />
+      )}
+      {voiceGuideEnabled
+        ? actions?.voiceOn || "Voice On"
+        : actions?.voiceOff || "Voice Off"}
+    </button>
+  );
 
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
@@ -597,9 +668,13 @@ function RegisterFarmer({ onNavigate }) {
 
       {phase === "language" ? (
         <div className="rounded-3xl border-2 border-emerald-900 bg-white p-6 shadow-sm sm:p-10">
-          <h1 className="mb-3 text-3xl font-extrabold leading-tight text-emerald-950 sm:text-4xl">
-            Choose your language
-          </h1>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="flex items-center gap-3 text-3xl font-extrabold leading-tight text-emerald-950 sm:text-4xl">
+              <Languages aria-hidden="true" size={32} />
+              Choose your language
+            </h1>
+            {voiceToggle}
+          </div>
           <p className="mb-8 text-lg text-slate-800">
             भाषा निवडा · भाषा चुनें
           </p>
@@ -612,7 +687,10 @@ function RegisterFarmer({ onNavigate }) {
                   onClick={() => void chooseLanguage(code)}
                   type="button"
                 >
-                  {config.name}
+                  <span className="flex items-center gap-3">
+                    <Sprout aria-hidden="true" size={26} />
+                    {config.name}
+                  </span>
                 </button>
               ),
             )}
@@ -807,18 +885,11 @@ function RegisterFarmer({ onNavigate }) {
       ) : (
         <div className="rounded-3xl border-2 border-emerald-900 bg-white p-5 shadow-sm sm:p-10">
           <div className="mb-7">
-            <div className="mb-3 flex items-center justify-between gap-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
               <p className="text-lg font-extrabold text-emerald-950">
                 {stepIndex + 1} / {FARMER_REGISTRATION_FIELDS.length}
               </p>
-              <button
-                className="min-h-12 rounded-xl border-2 border-emerald-900 px-4 text-base font-bold text-emerald-950 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isBusy || isSubmitting}
-                onClick={replayQuestion}
-                type="button"
-              >
-                {languageConfig.actions.replay}
-              </button>
+              {voiceToggle}
             </div>
             <div
               aria-label={`Question ${stepIndex + 1} of ${FARMER_REGISTRATION_FIELDS.length}`}
@@ -837,9 +908,19 @@ function RegisterFarmer({ onNavigate }) {
             </div>
           </div>
 
-          <p className="mb-6 text-2xl font-extrabold leading-snug text-slate-950 sm:text-3xl">
-            {step.prompt}
-          </p>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <p className="flex-1 text-2xl font-extrabold leading-snug text-slate-950 sm:text-3xl">
+              {step.prompt}
+            </p>
+            <button
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-emerald-900 px-4 py-2 font-bold text-emerald-950 hover:bg-emerald-50"
+              onClick={() => listenTo(step.prompt)}
+              type="button"
+            >
+              <Volume2 aria-hidden="true" size={22} />
+              {actions.listen}
+            </button>
+          </div>
 
           <button
             className={`mb-6 min-h-16 w-full rounded-2xl border-2 px-5 py-4 text-xl font-extrabold text-white focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-500 disabled:cursor-not-allowed disabled:opacity-60 ${
@@ -847,27 +928,47 @@ function RegisterFarmer({ onNavigate }) {
                 ? "border-red-900 bg-red-800 hover:bg-red-900"
                 : "border-emerald-950 bg-emerald-800 hover:bg-emerald-900"
             }`}
-            disabled={
-              isSubmitting ||
-              ["speaking", "requesting", "transcribing"].includes(phase)
-            }
+            aria-label={microphoneLabel}
+            disabled={isSubmitting || ["requesting", "transcribing"].includes(phase)}
             onClick={handleMicrophone}
             type="button"
           >
+            {phase === "recording" ? (
+              <Square aria-hidden="true" className="mr-2 inline" size={22} />
+            ) : phase === "requesting" || phase === "transcribing" ? (
+              <Loader2
+                aria-hidden="true"
+                className="mr-2 inline animate-spin"
+                size={22}
+              />
+            ) : (
+              <Mic aria-hidden="true" className="mr-2 inline" size={22} />
+            )}
             {microphoneLabel}
           </button>
 
           <label
-            className="mb-2 block text-lg font-bold text-slate-950"
+            className="mb-2 flex items-center gap-2 text-lg font-bold text-slate-950"
             htmlFor="farmer-answer"
           >
+            <FieldIcon aria-hidden="true" size={22} />
             {step.label}
           </label>
           <input
             autoComplete={field === "phone" ? "tel" : "off"}
-            className="min-h-14 w-full rounded-xl border-2 border-slate-700 bg-white px-4 py-3 text-xl text-slate-950 placeholder:text-slate-500 focus:border-emerald-800 focus:outline-4 focus:outline-emerald-200"
+            aria-describedby={[
+              validationMessage ? "farmer-answer-error" : null,
+              field === "phone" ? "farmer-phone-counter" : null,
+            ]
+              .filter(Boolean)
+              .join(" ") || undefined}
+            aria-invalid={Boolean(validationMessage)}
+            className={`min-h-14 w-full rounded-xl border-2 bg-white px-4 py-3 text-xl text-slate-950 placeholder:text-slate-500 focus:outline-4 focus:outline-emerald-200 ${
+              validationMessage
+                ? "border-red-700 focus:border-red-700"
+                : "border-slate-700 focus:border-emerald-800"
+            }`}
             id="farmer-answer"
-            maxLength={field === "phone" ? 15 : 100}
             disabled={isSubmitting}
             inputMode={
               field === "phone"
@@ -881,54 +982,97 @@ function RegisterFarmer({ onNavigate }) {
             value={value}
           />
 
-          {status && (
+          {field === "phone" && (
             <p
-              className="mt-4 rounded-xl border-2 border-amber-700 bg-amber-50 p-4 text-base font-semibold text-slate-950"
-              role="status"
+              className={`mt-2 text-sm font-semibold ${
+                phoneDigits > 10 ? "text-red-700" : "text-slate-700"
+              }`}
+              id="farmer-phone-counter"
             >
-              {status}
+              {phoneDigits}/10 {language === "en-IN" ? "digits" : "अंक"}
             </p>
           )}
 
-          {phase === "confirming" ? (
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {answerSource === "voice" && value && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border-2 border-sky-700 bg-sky-50 p-4">
+              <p
+                className="flex min-h-12 flex-1 items-center gap-2 font-semibold text-sky-950"
+                data-testid="voice-confirmation"
+              >
+                <Check aria-hidden="true" size={22} />
+                {actions.checkHeard}: <span className="break-all">{value}</span>
+              </p>
               <button
-                className="min-h-16 rounded-2xl border-2 border-emerald-950 bg-emerald-800 px-5 py-4 text-xl font-extrabold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={!readbackReady || !value.trim() || isSubmitting}
-                onClick={() => void acceptAnswer()}
+                aria-label={actions.listen}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-sky-900 px-3 py-2 font-bold text-sky-950"
+                onClick={() => {
+                  const spoken =
+                    field === "phone" ? phoneReadback(value, language) : value;
+                  listenTo(`${languageConfig.confirmPrefix}: ${spoken}`);
+                }}
                 type="button"
               >
-                {isSubmitting ? languageConfig.saving : languageConfig.actions.yes}
+                <Volume2 aria-hidden="true" size={20} />
+                {actions.listen}
               </button>
               <button
-                className="min-h-16 rounded-2xl border-2 border-red-900 bg-white px-5 py-4 text-xl font-extrabold text-red-950 hover:bg-red-50"
-                disabled={isSubmitting}
-                onClick={rejectAnswer}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-sky-900 px-3 py-2 font-bold text-sky-950"
+                onClick={handleMicrophone}
                 type="button"
               >
-                {languageConfig.actions.no}
+                <Mic aria-hidden="true" size={20} />
+                {actions.speakAgain}
               </button>
-              {!readbackReady && (
-                <button
-                  className="min-h-14 rounded-xl border-2 border-slate-700 px-4 py-3 text-lg font-bold text-slate-950 sm:col-span-2"
-                  disabled={isBusy || isSubmitting || !value.trim()}
-                  onClick={() => void reviewTypedAnswer()}
-                  type="button"
-                >
-                  {languageConfig.actions.readAgain}
-                </button>
-              )}
             </div>
-          ) : (
-            <button
-              className="mt-5 min-h-14 w-full rounded-xl border-2 border-emerald-950 bg-emerald-100 px-5 py-3 text-lg font-extrabold text-emerald-950 hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={!value.trim() || isBusy || isSubmitting}
-              onClick={() => void reviewTypedAnswer()}
-              type="button"
-            >
-              {languageConfig.actions.review}
-            </button>
           )}
+
+          {validationMessage && (
+            <div
+              aria-live="polite"
+              className="mt-3 flex flex-wrap items-center gap-2 text-base font-semibold text-red-800"
+              id="farmer-answer-error"
+              role="alert"
+              data-validation-code={validationErrorCode}
+            >
+              <AlertCircle aria-hidden="true" size={20} />
+              <span className="flex-1">{validationMessage.visual}</span>
+              <button
+                aria-label={actions.listen}
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 border-red-800 px-3 py-2 text-red-900"
+                onClick={() => listenTo(validationMessage.spoken)}
+                type="button"
+              >
+                <Volume2 aria-hidden="true" size={20} />
+                {actions.listen}
+              </button>
+            </div>
+          )}
+
+          {status && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border-2 border-amber-700 bg-amber-50 p-4 text-base font-semibold text-slate-950">
+              <AlertCircle aria-hidden="true" size={20} />
+              <p className="flex-1" role="status">{status}</p>
+              <button
+                aria-label={actions.listen}
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 border-amber-900 px-3 py-2"
+                onClick={() => listenTo(status)}
+                type="button"
+              >
+                <Volume2 aria-hidden="true" size={20} />
+                {actions.listen}
+              </button>
+            </div>
+          )}
+
+          <button
+            className="mt-5 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-emerald-950 bg-emerald-100 px-5 py-3 text-lg font-extrabold text-emerald-950 hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isSubmitting}
+            onClick={() => void proceedToNextStep()}
+            type="button"
+          >
+            <ArrowRight aria-hidden="true" size={24} />
+            {actions.proceed}
+          </button>
         </div>
       )}
     </section>

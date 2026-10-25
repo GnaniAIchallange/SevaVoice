@@ -22,9 +22,6 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     documentListening: "ऐकत आहे...",
     retry: "मला उत्तर समजले नाही. कृपया पुन्हा सांगा किंवा टाइप करा.",
     confirmPrefix: "तुम्ही सांगितले",
-    confirmQuestion: "हे बरोबर आहे का?",
-    invalidPhone: "कृपया दहा अंकी भारतीय मोबाईल क्रमांक सांगा.",
-    invalidAcres: "कृपया एकरमधील जमीन संख्या म्हणून सांगा.",
     done: "तुमची माहिती जतन झाली आहे.",
     duplicatePhone: "हा मोबाईल क्रमांक आधीच नोंदणीकृत आहे.",
     invalidDetails: "कृपया माहिती तपासा आणि पुन्हा प्रयत्न करा.",
@@ -33,20 +30,21 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     actions: {
       title: "शेतकरी नोंदणी",
       back: "मागे",
-      replay: "प्रश्न पुन्हा ऐका",
-      start: "बोलायला सुरुवात करा",
-      stop: "ऐकणे थांबवा",
-      requesting: "मायक्रोफोन सुरू होत आहे...",
-      review: "माझे उत्तर तपासा",
-      readAgain: "माझे उत्तर पुन्हा ऐका",
-      yes: "✓ हो, बरोबर",
-      no: "✕ नाही, पुन्हा प्रयत्न करा",
+      voiceOn: "Voice On",
+      voiceOff: "Voice Off",
+      listen: "ऐका",
+      speakAnswer: "तुमचे उत्तर बोला",
+      stopRecording: "रेकॉर्डिंग थांबवा",
+      startingMic: "मायक्रोफोन सुरू होत आहे",
+      proceed: "पुढे चला",
+      checkHeard: "आम्ही ऐकलेले उत्तर तपासा",
+      speakAgain: "पुन्हा बोला",
+      emptyTranscript: "आवाज ऐकू आला नाही. पुन्हा बोला किंवा उत्तर लिहा.",
       placeholder: "बोला किंवा उत्तर टाइप करा",
       permissionHint: "मायक्रोफोन वापरण्यासाठी परवानगी द्या.",
       micDenied: "मायक्रोफोनची परवानगी नाकारली. उत्तर टाइप करा.",
       micFallback: "आवाज इनपुट उपलब्ध नाही. उत्तर टाइप करा.",
       voiceFallback: "आवाज उपलब्ध नाही. तुम्ही उत्तर टाइप करू शकता.",
-      readbackFallback: "तुमचे उत्तर खाली तपासा. आवाज उपलब्ध नाही.",
       completeTitle: "माहिती पूर्ण",
       login: "लॉगिन पृष्ठावर जा",
     },
@@ -79,9 +77,6 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     documentListening: "सुन रहा है...",
     retry: "मुझे जवाब समझ नहीं आया। कृपया फिर से बोलें या टाइप करें।",
     confirmPrefix: "आपने कहा",
-    confirmQuestion: "क्या यह सही है?",
-    invalidPhone: "कृपया दस अंकों का भारतीय मोबाइल नंबर बताएं।",
-    invalidAcres: "कृपया जमीन एकड़ में संख्या के रूप में बताएं।",
     done: "आपकी जानकारी सहेज ली गई है।",
     duplicatePhone: "यह मोबाइल नंबर पहले से पंजीकृत है।",
     invalidDetails: "कृपया जानकारी जाँचकर फिर कोशिश करें।",
@@ -90,20 +85,21 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     actions: {
       title: "किसान पंजीकरण",
       back: "वापस",
-      replay: "सवाल फिर सुनें",
-      start: "बोलना शुरू करें",
-      stop: "सुनना बंद करें",
-      requesting: "माइक्रोफ़ोन शुरू हो रहा है...",
-      review: "मेरा जवाब जाँचें",
-      readAgain: "मेरा जवाब फिर सुनें",
-      yes: "✓ हाँ, सही",
-      no: "✕ नहीं, फिर कोशिश करें",
+      voiceOn: "Voice On",
+      voiceOff: "Voice Off",
+      listen: "सुनें",
+      speakAnswer: "अपना जवाब बोलें",
+      stopRecording: "रिकॉर्डिंग रोकें",
+      startingMic: "माइक्रोफ़ोन शुरू हो रहा है",
+      proceed: "आगे बढ़ें",
+      checkHeard: "सुने हुए जवाब को जाँचें",
+      speakAgain: "फिर से बोलें",
+      emptyTranscript: "आवाज़ सुनाई नहीं दी। फिर बोलें या जवाब लिखें।",
       placeholder: "बोलें या जवाब लिखें",
       permissionHint: "माइक्रोफ़ोन की अनुमति दें।",
       micDenied: "माइक्रोफ़ोन की अनुमति नहीं मिली। जवाब लिखें।",
       micFallback: "आवाज़ इनपुट उपलब्ध नहीं है। जवाब लिखें।",
       voiceFallback: "आवाज़ उपलब्ध नहीं है। आप जवाब लिख सकते हैं।",
-      readbackFallback: "नीचे अपना जवाब देखें। आवाज़ उपलब्ध नहीं है।",
       completeTitle: "जानकारी पूरी हुई",
       login: "लॉगिन पृष्ठ पर जाएँ",
     },
@@ -136,9 +132,6 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     documentListening: "Listening...",
     retry: "I could not understand that. Please say it again or type your answer.",
     confirmPrefix: "You said",
-    confirmQuestion: "Is that correct?",
-    invalidPhone: "Please provide a valid ten-digit Indian mobile number.",
-    invalidAcres: "Please enter the land size in acres as a number.",
     done: "Your details are saved.",
     duplicatePhone: "This mobile number is already registered.",
     invalidDetails: "Check your details and try again.",
@@ -147,20 +140,21 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     actions: {
       title: "Farmer registration",
       back: "Back",
-      replay: "Replay question",
-      start: "Start speaking",
-      stop: "Stop listening",
-      requesting: "Starting microphone...",
-      review: "Review my answer",
-      readAgain: "Read my answer again",
-      yes: "✓ Yes, correct",
-      no: "✕ No, try again",
+      voiceOn: "Voice On",
+      voiceOff: "Voice Off",
+      listen: "Listen",
+      speakAnswer: "Speak your answer",
+      stopRecording: "Stop recording",
+      startingMic: "Starting microphone",
+      proceed: "Proceed",
+      checkHeard: "Please check what we heard",
+      speakAgain: "Speak again",
+      emptyTranscript: "We couldn't hear that, please try again or type your answer.",
       placeholder: "Speak or type your answer",
       permissionHint: "Your phone may ask you to allow microphone access.",
       micDenied: "Microphone access was denied. Type your answer below instead.",
       micFallback: "Voice input is unavailable. Type your answer below instead.",
       voiceFallback: "Voice playback is unavailable. You can still type your answer.",
-      readbackFallback: "Review your answer below. Voice playback is unavailable.",
       completeTitle: "Details complete",
       login: "Go to login",
     },
@@ -178,6 +172,159 @@ export const FARMER_REGISTRATION_LANGUAGES = {
         prompt: "How many acres of land do you have?",
       },
       crop: { label: "Main crop", prompt: "What is your main crop?" },
+    },
+  },
+};
+
+const VALIDATION_MESSAGES = {
+  "mr-IN": {
+    required: {
+      visual: "हे उत्तर आवश्यक आहे.",
+      spoken: "कृपया उत्तर द्या.",
+    },
+    phone_digits: {
+      visual: "फक्त अंक वापरा. मोकळी जागा किंवा हायफन चालेल.",
+      spoken: "कृपया मोबाईल क्रमांक फक्त अंकात सांगा.",
+    },
+    phone_short: {
+      visual: "तुम्ही {digits} अंक दिले; मोबाईल क्रमांकासाठी १० अंक हवेत.",
+      spoken: "मोबाईल क्रमांक दहा अंकांचा असावा.",
+    },
+    phone_long: {
+      visual: "तुम्ही {digits} अंक दिले; {extra} अंक कमी करा.",
+      spoken: "मोबाईल क्रमांक दहा अंकांचा असावा.",
+    },
+    phone_start: {
+      visual: "क्रमांक ६, ७, ८ किंवा ९ ने सुरू झाला पाहिजे.",
+      spoken: "क्रमांक सहा, सात, आठ किंवा नऊने सुरू करा.",
+    },
+    text_short: {
+      visual: "किमान {min} अक्षरे लिहा.",
+      spoken: "कृपया थोडे मोठे उत्तर द्या.",
+    },
+    text_long: {
+      visual: "उत्तर १०० अक्षरांपेक्षा लांब असू शकत नाही.",
+      spoken: "उत्तर थोडक्यात सांगा.",
+    },
+    acres_number: {
+      visual: "एकरमधील जमीन संख्या म्हणून लिहा. दशांश चालतात.",
+      spoken: "जमिनीचे क्षेत्रफळ संख्या म्हणून सांगा.",
+    },
+    acres_positive: {
+      visual: "जमिनीचे क्षेत्रफळ शून्यापेक्षा जास्त असावे.",
+      spoken: "जमिनीचे क्षेत्रफळ शून्यापेक्षा जास्त असावे.",
+    },
+    acres_max: {
+      visual: "जमीन १०,००० एकरांपेक्षा जास्त असू शकत नाही.",
+      spoken: "जमीन दहा हजार एकरांपेक्षा जास्त असू शकत नाही.",
+    },
+    duplicate: {
+      visual: "हा मोबाईल क्रमांक आधीच नोंदणीकृत आहे.",
+      spoken: "हा मोबाईल क्रमांक आधीच नोंदणीकृत आहे.",
+    },
+    server_invalid: {
+      visual: "ही माहिती तपासा आणि पुन्हा प्रयत्न करा.",
+      spoken: "कृपया माहिती तपासा.",
+    },
+  },
+  "hi-IN": {
+    required: {
+      visual: "यह जवाब ज़रूरी है।",
+      spoken: "कृपया जवाब दें।",
+    },
+    phone_digits: {
+      visual: "सिर्फ अंक लिखें। खाली जगह या हाइफ़न ठीक है।",
+      spoken: "मोबाइल नंबर सिर्फ अंकों में बताएं।",
+    },
+    phone_short: {
+      visual: "आपने {digits} अंक लिखे; मोबाइल नंबर के लिए १० अंक चाहिए।",
+      spoken: "मोबाइल नंबर दस अंकों का होना चाहिए।",
+    },
+    phone_long: {
+      visual: "आपने {digits} अंक लिखे; {extra} अंक कम करें।",
+      spoken: "मोबाइल नंबर दस अंकों का होना चाहिए।",
+    },
+    phone_start: {
+      visual: "नंबर ६, ७, ८ या ९ से शुरू होना चाहिए।",
+      spoken: "नंबर छह, सात, आठ या नौ से शुरू करें।",
+    },
+    text_short: {
+      visual: "कम से कम {min} अक्षर लिखें।",
+      spoken: "कृपया थोड़ा बड़ा जवाब दें।",
+    },
+    text_long: {
+      visual: "जवाब १०० अक्षरों से बड़ा नहीं हो सकता।",
+      spoken: "जवाब छोटा करके बताएं।",
+    },
+    acres_number: {
+      visual: "जमीन का क्षेत्रफल एकड़ में संख्या के रूप में लिखें। दशमलव ठीक हैं।",
+      spoken: "जमीन का क्षेत्रफल संख्या में बताएं।",
+    },
+    acres_positive: {
+      visual: "जमीन का क्षेत्रफल शून्य से ज़्यादा होना चाहिए।",
+      spoken: "जमीन का क्षेत्रफल शून्य से ज़्यादा होना चाहिए।",
+    },
+    acres_max: {
+      visual: "जमीन १०,००० एकड़ से ज़्यादा नहीं हो सकती।",
+      spoken: "जमीन दस हजार एकड़ से ज़्यादा नहीं हो सकती।",
+    },
+    duplicate: {
+      visual: "यह मोबाइल नंबर पहले से पंजीकृत है।",
+      spoken: "यह मोबाइल नंबर पहले से पंजीकृत है।",
+    },
+    server_invalid: {
+      visual: "जानकारी जाँचकर फिर कोशिश करें।",
+      spoken: "कृपया जानकारी जाँचें।",
+    },
+  },
+  "en-IN": {
+    required: {
+      visual: "This answer is required.",
+      spoken: "Please provide an answer.",
+    },
+    phone_digits: {
+      visual: "Use digits only. Spaces or hyphens are okay.",
+      spoken: "Please enter the mobile number using digits only.",
+    },
+    phone_short: {
+      visual: "You entered {digits} digits; a mobile number needs 10.",
+      spoken: "A mobile number needs ten digits.",
+    },
+    phone_long: {
+      visual: "You entered {digits} digits; remove {extra}.",
+      spoken: "A mobile number needs ten digits.",
+    },
+    phone_start: {
+      visual: "The number must start with 6, 7, 8, or 9.",
+      spoken: "Start the number with six, seven, eight, or nine.",
+    },
+    text_short: {
+      visual: "Enter at least {min} characters.",
+      spoken: "Please give a longer answer.",
+    },
+    text_long: {
+      visual: "The answer cannot exceed 100 characters.",
+      spoken: "Please make your answer shorter.",
+    },
+    acres_number: {
+      visual: "Enter land in acres as a number. Decimals are allowed.",
+      spoken: "Please say the land size as a number.",
+    },
+    acres_positive: {
+      visual: "The land size must be greater than zero.",
+      spoken: "The land size must be greater than zero.",
+    },
+    acres_max: {
+      visual: "Land size cannot exceed 10,000 acres.",
+      spoken: "Land size cannot exceed ten thousand acres.",
+    },
+    duplicate: {
+      visual: "This number is already registered.",
+      spoken: "This number is already registered.",
+    },
+    server_invalid: {
+      visual: "Check this information and try again.",
+      spoken: "Please check this information.",
     },
   },
 };
@@ -301,7 +448,7 @@ export function normalize(field, value) {
   }
 
   if (field === "acres") {
-    if (/^[+-]?\d+(?:\.\d+)?$/.test(input)) {
+    if (/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(input)) {
       return input;
     }
     return mapSpokenNumber(input).replace(/,/g, "");
@@ -310,27 +457,105 @@ export function normalize(field, value) {
   return input;
 }
 
+function hasOnlyPhoneCharacters(value) {
+  const input = normalizeDevanagariDigits(String(value ?? "").trim());
+  if (/^\+?\d[\d\s-]*$/.test(input)) {
+    return true;
+  }
+  if (input.startsWith("+")) {
+    return false;
+  }
+
+  const tokens = input
+    .toLocaleLowerCase()
+    .match(/[\p{L}\p{M}\d]+/gu);
+  if (!tokens?.length) {
+    return false;
+  }
+  const punctuation = input.replace(/[\p{L}\p{M}\d\s,.\-!?।]/gu, "");
+  return (
+    !punctuation &&
+    tokens.every((token) => /^\d+$/.test(token) || SPOKEN_DIGITS.has(token))
+  );
+}
+
+export function phoneDigitCount(value) {
+  return normalize("phone", value).length;
+}
+
 export function validateFarmerAnswer(field, value) {
-  const normalized = normalize(field, value);
-
-  if (!normalized) {
-    return "empty";
+  const input = String(value ?? "").trim();
+  if (!input) {
+    return "required";
   }
 
-  if (field === "phone" && !/^[6-9]\d{9}$/.test(normalized)) {
-    return "phone";
+  if (field === "phone") {
+    if (!hasOnlyPhoneCharacters(input)) {
+      return "phone_digits";
+    }
+
+    const normalized = normalize(field, input);
+    if (normalized.length < 10) {
+      return "phone_short";
+    }
+    if (normalized.length > 10) {
+      return "phone_long";
+    }
+    if (!/^[6-9]\d{9}$/.test(normalized)) {
+      return "phone_start";
+    }
+    return null;
   }
 
-  if (
-    field === "acres" &&
-    (!Number.isFinite(Number(normalized)) ||
-      Number(normalized) <= 0 ||
-      Number(normalized) > 10000)
-  ) {
-    return "acres";
+  if (field === "acres") {
+    const normalized = normalize(field, input);
+    if (!/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(normalized)) {
+      return "acres_number";
+    }
+    const acres = Number(normalized);
+    if (!Number.isFinite(acres)) {
+      return "acres_number";
+    }
+    if (acres <= 0) {
+      return "acres_positive";
+    }
+    if (acres > 10000) {
+      return "acres_max";
+    }
+    return null;
+  }
+
+  const normalized = normalize(field, input);
+  const minimumLength = field === "name" ? 2 : 1;
+  if (normalized.length < minimumLength) {
+    return "text_short";
+  }
+  if (normalized.length > 100) {
+    return "text_long";
   }
 
   return null;
+}
+
+export function getFarmerValidationMessage(code, language, { digits, min } = {}) {
+  const message = VALIDATION_MESSAGES[language]?.[code];
+  if (!message) {
+    return null;
+  }
+
+  const extra = typeof digits === "number" ? Math.max(0, digits - 10) : "";
+  const replacements = { digits, extra, min };
+  const interpolate = (text) =>
+    text.replace(/\{(\w+)\}/g, (_match, key) => String(replacements[key] ?? ""));
+
+  return {
+    visual: interpolate(message.visual),
+    spoken: message.spoken,
+  };
+}
+
+export function getFarmerValidationCodes() {
+  return Object.keys(VALIDATION_MESSAGES["en-IN"]);
 }
 
 export function phoneReadback(value, language) {

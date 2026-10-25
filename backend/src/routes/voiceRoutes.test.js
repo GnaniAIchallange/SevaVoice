@@ -9,6 +9,7 @@ process.env.JWT_SECRET ??= "test-secret-at-least-thirty-two-characters";
 process.env.GNANI_API_KEY = "";
 
 const { createVoiceRouter } = await import("./voiceRoutes.js");
+const { createFarmerRouter } = await import("./farmerRoutes.js");
 const { createVoiceService } = await import("../services/voiceService.js");
 const { default: app } = await import("../app.js");
 
@@ -109,6 +110,49 @@ test("STT maps oversized uploads to a JSON 400 response", async () => {
       error: "Audio file must be 5MB or smaller",
     });
   });
+});
+
+test("document registration middleware does not intercept voice STT uploads", async () => {
+  let transcribed = false;
+  const app = express();
+  app.use(express.json());
+  app.use(
+    "/api/farmers",
+    createFarmerRouter({ registrationLimiter: allowRequests }),
+  );
+  app.use(
+    "/api/voice",
+    createVoiceRouter({
+      limiter: allowRequests,
+      service: createService({
+        transcribe: async ({ file, language }) => {
+          transcribed = true;
+          assert.equal(file.originalname, "recording.wav");
+          assert.equal(language, "hi-IN");
+          return "test transcript";
+        },
+      }),
+    }),
+  );
+  const server = createServer(app);
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:${server.address().port}/api/voice/stt`,
+      {
+        method: "POST",
+        body: sttForm(),
+      },
+    );
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { transcript: "test transcript" });
+    assert.equal(transcribed, true);
+  } finally {
+    await new Promise((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
 });
 
 test("TTS rejects empty, oversized, and unsupported-language requests", async () => {

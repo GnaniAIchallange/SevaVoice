@@ -1,4 +1,5 @@
 import RouteLink from "../../components/RouteLink.jsx";
+import { HeartHandshake, Sprout } from "lucide-react";
 
 function RegistrationChooser({ onNavigate }) {
   return (
@@ -14,14 +15,20 @@ function RegistrationChooser({ onNavigate }) {
           to="/register/donor"
           onNavigate={onNavigate}
         >
-          Register as Donor / देणगीदार / दाता
+          <span className="flex items-center justify-center gap-3">
+            <HeartHandshake aria-hidden="true" size={26} />
+            Register as Donor / देणगीदार / दाता
+          </span>
         </RouteLink>
         <RouteLink
           className="flex min-h-16 items-center justify-center rounded-xl border-2 border-emerald-900 bg-white px-5 py-4 text-center text-xl font-bold text-emerald-950 no-underline hover:bg-emerald-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
           to="/register/farmer"
           onNavigate={onNavigate}
         >
-          Register as Farmer / शेतकरी / किसान
+          <span className="flex items-center justify-center gap-3">
+            <Sprout aria-hidden="true" size={26} />
+            Register as Farmer / शेतकरी / किसान
+          </span>
         </RouteLink>
       </div>
     </section>

@@ -33,6 +33,8 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
   let silentAudioUrl = null;
   let audioUnlocked = false;
   let currentPlaybackCancel = null;
+  let currentRequestController = null;
+  let transcriptionController = null;
   let playbackGeneration = 0;
   let disposed = false;
 
@@ -41,23 +43,39 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
     body.append("audio_file", audio, "recording.wav");
     body.append("language_code", language);
 
-    const response = await fetchImpl(`${API_URL}/api/voice/stt`, {
-      method: "POST",
-      body,
-    });
-    const result = await response.json();
+    const controller = new AbortController();
+    transcriptionController = controller;
+    try {
+      const response = await fetchImpl(`${API_URL}/api/voice/stt`, {
+        method: "POST",
+        body,
+        signal: controller.signal,
+      });
+      const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.error || "Speech recognition is unavailable");
+      if (controller.signal.aborted || disposed) {
+        throw new DOMException("Speech request stopped", "AbortError");
+      }
+      if (!response.ok) {
+        throw new Error(result.error || "Speech recognition is unavailable");
+      }
+
+      return typeof result.transcript === "string"
+        ? result.transcript.trim()
+        : "";
+    } finally {
+      if (transcriptionController === controller) {
+        transcriptionController = null;
+      }
     }
-
-    return typeof result.transcript === "string" ? result.transcript.trim() : "";
   }
 
   function cancelPlayback(audioElement, invalidate = true) {
     if (invalidate) {
       playbackGeneration += 1;
     }
+    currentRequestController?.abort();
+    currentRequestController = null;
     if (currentPlaybackCancel) {
       currentPlaybackCancel(
         new DOMException("Audio playback stopped", "AbortError"),
@@ -108,9 +126,8 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
       throw new Error("Voice player has been disposed");
     }
 
-    const operation = playbackGeneration + 1;
-    playbackGeneration = operation;
-    cancelPlayback(audioElement, false);
+    cancelPlayback(audioElement);
+    const operation = playbackGeneration;
     if (!audioUnlocked) {
       silentAudioUrl = createSilentWavUrl();
       audioElement.src = silentAudioUrl;
@@ -126,11 +143,30 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
     let audioUrl = audioUrls.get(key);
 
     if (!audioUrl) {
-      const response = await fetchImpl(`${API_URL}/api/voice/tts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, language }),
-      });
+      const controller = new AbortController();
+      currentRequestController = controller;
+      let response;
+      try {
+        response = await fetchImpl(`${API_URL}/api/voice/tts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, language }),
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (
+          disposed ||
+          controller.signal.aborted ||
+          playbackGeneration !== operation
+        ) {
+          throw new DOMException("Audio playback stopped", "AbortError");
+        }
+        throw error;
+      }
+
+      if (disposed || controller.signal.aborted || playbackGeneration !== operation) {
+        throw new DOMException("Audio playback stopped", "AbortError");
+      }
 
       if (!response.ok) {
         let message = "Speech playback is unavailable";
@@ -143,8 +179,15 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
       }
 
       const blob = await response.blob();
-      if (disposed || playbackGeneration !== operation) {
+      if (
+        disposed ||
+        controller.signal.aborted ||
+        playbackGeneration !== operation
+      ) {
         throw new DOMException("Voice player has been disposed", "AbortError");
+      }
+      if (currentRequestController === controller) {
+        currentRequestController = null;
       }
 
       audioUrl = URL.createObjectURL(
@@ -170,6 +213,8 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
   function dispose(audioElement) {
     disposed = true;
     cancelPlayback(audioElement);
+    transcriptionController?.abort();
+    transcriptionController = null;
     audioElement?.removeAttribute("src");
     audioElement?.load();
 

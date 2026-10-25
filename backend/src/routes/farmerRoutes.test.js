@@ -21,6 +21,16 @@ const farmerPayload = {
   password: "safe-test-password",
   farmerRegistrationKey: "8b7a5187-4c5e-43df-9178-836d8cc129b1",
 };
+const voiceRegistrationPayload = {
+  fullName: "Voice Test Farmer",
+  mobileNumber: "9876543211",
+  village: "Voice Village",
+  district: "Voice District",
+  state: "Maharashtra",
+  landSizeAcres: 1.5,
+  cropType: "Wheat",
+  preferredLanguage: "mr-IN",
+};
 
 function createModels({ userCreate, documentCreate } = {}) {
   const savedUser = {
@@ -70,6 +80,7 @@ function createModels({ userCreate, documentCreate } = {}) {
 async function withServer(models, run, registrationLimiter = allowRequests) {
   const storageDirectory = await mkdtemp(path.join(os.tmpdir(), "sevavoice-docs-"));
   const app = express();
+  app.use(express.json());
   app.use(
     "/api/farmers",
     createFarmerRouter({
@@ -120,6 +131,54 @@ async function postRegistration(baseUrl, form = registrationForm()) {
     body: form,
   });
 }
+
+async function postVoiceRegistration(baseUrl, payload = voiceRegistrationPayload) {
+  return fetch(`${baseUrl}/api/farmers/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+test("farmer registration accepts the original voice-only JSON payload", async () => {
+  let savedRegistration;
+  const registrationTime = new Date("2026-01-01T00:00:00Z");
+  await withServer(
+    {
+      FarmerRegistrationModel: {
+        async create(data) {
+          savedRegistration = {
+            id: "registration-1",
+            ...data,
+            createdAt: registrationTime,
+            updatedAt: registrationTime,
+          };
+          return savedRegistration;
+        },
+      },
+    },
+    async (baseUrl) => {
+      const response = await postVoiceRegistration(baseUrl);
+      const body = await response.json();
+
+      assert.equal(response.status, 201);
+      assert.deepEqual(savedRegistration, {
+        id: "registration-1",
+        ...voiceRegistrationPayload,
+        verificationStatus: "pending",
+        createdAt: registrationTime,
+        updatedAt: registrationTime,
+      });
+      assert.deepEqual(body.farmer, {
+        id: "registration-1",
+        ...voiceRegistrationPayload,
+        verificationStatus: "pending",
+        createdAt: registrationTime.toISOString(),
+        updatedAt: registrationTime.toISOString(),
+      });
+    },
+  );
+});
 
 test("farmer registration stores user and document metadata with pending verification", async () => {
   const models = createModels();
