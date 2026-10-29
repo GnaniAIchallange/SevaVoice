@@ -6,6 +6,7 @@ import farmerWorkspaceRoutes from "./routes/farmerWorkspaceRoutes.js";
 import voiceRoutes from "./routes/voiceRoutes.js";
 import verifierRoutes from "./routes/verifierRoutes.js";
 import donorRoutes from "./routes/donorRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/farmer", farmerWorkspaceRoutes);
 app.use("/api/voice", voiceRoutes);
 app.use("/api/verifier", verifierRoutes);
 app.use("/api/donor", donorRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((error, _req, res, _next) => {
   if (error.status >= 400 && error.status < 500) {

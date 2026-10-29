@@ -10,6 +10,8 @@ const schema = z.object({
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
   JWT_EXPIRES_IN: z.string().default("1h"),
   GNANI_API_KEY: z.string().default(""),
+  RAZORPAY_KEY_ID: z.string().default("rzp_test_sevavoice_placeholder"),
+  RAZORPAY_KEY_SECRET: z.string().default("rzp_test_secret_placeholder"),
 });
 
 const result = schema.safeParse(process.env);

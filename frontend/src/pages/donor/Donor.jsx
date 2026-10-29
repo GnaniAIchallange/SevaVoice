@@ -485,7 +485,13 @@ export default function Donor({ user }) {
       {donationTargetRequest && (
         <DonationModal
           request={donationTargetRequest}
+          user={user}
           onClose={() => setDonationTargetRequest(null)}
+          onSuccess={() => {
+            loadOverview();
+            loadRequests();
+            if (activeTab === 'history') loadHistory();
+          }}
         />
       )}
     </div>

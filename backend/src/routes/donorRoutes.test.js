@@ -164,3 +164,145 @@ test('public request details endpoint rejects unapproved requests and unverified
     assert.equal(resPending.status, 404);
   });
 });
+
+test('create-order rejects unapproved request or invalid amount', async () => {
+  const requestId = new mongoose.Types.ObjectId();
+  const AssistanceRequestModel = {
+    findById() {
+      return {
+        populate() {
+          return {
+            async lean() {
+              return {
+                _id: requestId,
+                status: REQUEST_STATUS.SUBMITTED, // not approved
+                farmerId: { isActive: true, farmerVerificationStatus: 'verified' },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  await withDonorServer({ AssistanceRequestModel }, async (baseUrl) => {
+    const res = await fetch(`${baseUrl}/api/donor/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestId: String(requestId), amount: 0 }),
+    });
+    assert.equal(res.status, 400);
+
+    const resUnapproved = await fetch(`${baseUrl}/api/donor/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestId: String(requestId), amount: 500 }),
+    });
+    assert.equal(resUnapproved.status, 400);
+  });
+});
+
+test('create-order and verify-payment succeed with valid signature', async () => {
+  const requestId = new mongoose.Types.ObjectId();
+  const donationId = new mongoose.Types.ObjectId();
+
+  const AssistanceRequestModel = {
+    findById() {
+      return {
+        populate() {
+          return {
+            async lean() {
+              return {
+                _id: requestId,
+                status: REQUEST_STATUS.APPROVED,
+                amountRequested: 5000,
+                amountFunded: 0,
+                farmerId: { isActive: true, farmerVerificationStatus: 'verified' },
+              };
+            },
+          };
+        },
+      };
+    },
+    async findByIdAndUpdate(id, update) {
+      assert.equal(String(id), String(requestId));
+      return {
+        _id: requestId,
+        amountRequested: 5000,
+        amountFunded: update.$inc.amountFunded,
+        status: REQUEST_STATUS.APPROVED,
+        async save() {},
+      };
+    },
+  };
+
+  const mockDonation = {
+    _id: donationId,
+    requestId,
+    amount: 1000,
+    status: 'created',
+    razorpayOrderId: 'order_test123',
+    async save() {
+      return this;
+    },
+  };
+
+  const DonationModel = {
+    async create(doc) {
+      return { ...mockDonation, ...doc };
+    },
+    async findById(id) {
+      if (String(id) === String(donationId)) return mockDonation;
+      return null;
+    },
+    async findOne() {
+      return mockDonation;
+    },
+  };
+
+  const orderCreator = async ({ amount }) => ({
+    orderId: 'order_test123',
+    amount: amount * 100,
+    currency: 'INR',
+    keyId: 'rzp_test_123',
+    isSimulated: true,
+  });
+
+  const signatureVerifier = ({ orderId, paymentId, signature }) => {
+    return orderId === 'order_test123' && paymentId === 'pay_test123' && signature === 'valid_sig';
+  };
+
+  await withDonorServer(
+    { AssistanceRequestModel, DonationModel, orderCreator, signatureVerifier },
+    async (baseUrl) => {
+      // 1. Create Order
+      const createRes = await fetch(`${baseUrl}/api/donor/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId: String(requestId), amount: 1000 }),
+      });
+      assert.equal(createRes.status, 201);
+      const createData = await createRes.json();
+      assert.equal(createData.success, true);
+      assert.equal(createData.orderId, 'order_test123');
+
+      // 2. Verify Payment with valid signature
+      const verifyRes = await fetch(`${baseUrl}/api/donor/verify-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          donationId: String(donationId),
+          razorpay_order_id: 'order_test123',
+          razorpay_payment_id: 'pay_test123',
+          razorpay_signature: 'valid_sig',
+        }),
+      });
+      assert.equal(verifyRes.status, 200);
+      const verifyData = await verifyRes.json();
+      assert.equal(verifyData.success, true);
+      assert.equal(mockDonation.status, 'completed');
+      assert.equal(mockDonation.razorpayPaymentId, 'pay_test123');
+    }
+  );
+});
+

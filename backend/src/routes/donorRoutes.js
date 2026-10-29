@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { env } from '../config/env.js';
-import { AssistanceRequest, Donation, User } from '../models/index.js';
+import { AssistanceRequest, AuditLog, Donation, User } from '../models/index.js';
 import { REQUEST_STATUS, ROLES } from '../utils/constants.js';
+import { createRazorpayOrder, verifyPaymentSignature } from '../services/paymentService.js';
 
 // Optional donor authentication middleware (allows anonymous browsing while attaching user if token present)
 function optionalAuth(req, _res, next) {
@@ -47,6 +49,9 @@ export function createDonorRouter({
   UserModel = User,
   AssistanceRequestModel = AssistanceRequest,
   DonationModel = Donation,
+  AuditLogModel = AuditLog,
+  orderCreator = createRazorpayOrder,
+  signatureVerifier = verifyPaymentSignature,
 } = {}) {
   const router = Router();
 
@@ -329,6 +334,217 @@ export function createDonorRouter({
     } catch (error) {
       console.error('Error fetching donor history:', error);
       return res.status(500).json({ message: 'Unable to retrieve donation history' });
+    }
+  });
+
+  // Create Razorpay Order for donation
+  router.post('/create-order', optionalAuth, async (req, res) => {
+    try {
+      const orderSchema = z.object({
+        requestId: z.string().min(1),
+        amount: z.coerce.number().int().min(1, 'Donation amount must be at least ₹1'),
+        notes: z.string().trim().optional(),
+        isAnonymous: z.boolean().optional(),
+        donorName: z.string().trim().optional(),
+        donorEmail: z.string().trim().optional(),
+        donorPhone: z.string().trim().optional(),
+      });
+
+      const parsed = orderSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          message: 'Invalid request data',
+          errors: parsed.error.issues.map((i) => i.message),
+        });
+      }
+
+      const { requestId, amount, notes, isAnonymous, donorName, donorEmail, donorPhone } = parsed.data;
+
+      if (!mongoose.isValidObjectId(requestId)) {
+        return res.status(400).json({ message: 'Invalid request identifier' });
+      }
+
+      const requestItem = await AssistanceRequestModel.findById(requestId)
+        .populate('farmerId', 'name farmerVerificationStatus verificationStatus isActive')
+        .lean();
+
+      if (!requestItem) {
+        return res.status(404).json({ message: 'Assistance request not found' });
+      }
+
+      const farmer = requestItem.farmerId;
+      const isFarmerVerified =
+        farmer &&
+        farmer.isActive &&
+        (farmer.farmerVerificationStatus === 'verified' || farmer.verificationStatus === 'verified');
+
+      if (requestItem.status !== REQUEST_STATUS.APPROVED || !isFarmerVerified) {
+        return res.status(400).json({
+          message: 'This request is not currently eligible for contributions',
+        });
+      }
+
+      // Create Razorpay order
+      const order = await orderCreator({
+        amount,
+        currency: 'INR',
+        receipt: `seva_${Date.now()}`,
+        notes: {
+          requestId: String(requestItem._id),
+          donorId: req.auth?.userId || 'guest',
+        },
+      });
+
+      // Persist donation record
+      const donation = await DonationModel.create({
+        donorId: req.auth?.userId || null,
+        requestId: requestItem._id,
+        amount,
+        currency: order.currency || 'INR',
+        status: 'created',
+        razorpayOrderId: order.orderId,
+        notes: notes || '',
+        isAnonymous: Boolean(isAnonymous),
+        donorName: donorName || '',
+        donorEmail: donorEmail || '',
+        donorPhone: donorPhone || '',
+      });
+
+      return res.status(201).json({
+        success: true,
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency || 'INR',
+        keyId: order.keyId,
+        donationId: donation._id,
+        isSimulated: Boolean(order.isSimulated),
+      });
+    } catch (error) {
+      console.error('Error creating donation order:', error);
+      return res.status(500).json({ message: 'Unable to initiate donation payment' });
+    }
+  });
+
+  // Verify Razorpay payment and complete donation
+  router.post('/verify-payment', optionalAuth, async (req, res) => {
+    try {
+      const verifySchema = z.object({
+        razorpay_order_id: z.string().min(1),
+        razorpay_payment_id: z.string().min(1),
+        razorpay_signature: z.string().min(1),
+        donationId: z.string().optional(),
+      });
+
+      const parsed = verifySchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          message: 'Invalid payment verification payload',
+          errors: parsed.error.issues.map((i) => i.message),
+        });
+      }
+
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature, donationId } = parsed.data;
+
+      let donation = null;
+      if (donationId && mongoose.isValidObjectId(donationId)) {
+        donation = await DonationModel.findById(donationId);
+      }
+      if (!donation && razorpay_order_id) {
+        donation = await DonationModel.findOne({ razorpayOrderId: razorpay_order_id });
+      }
+
+      if (!donation) {
+        return res.status(404).json({ message: 'Donation record not found for this order' });
+      }
+
+      if (donation.status === 'completed') {
+        return res.json({
+          success: true,
+          message: 'Payment already verified successfully',
+          donation: {
+            id: donation._id,
+            amount: donation.amount,
+            status: donation.status,
+            razorpayPaymentId: donation.razorpayPaymentId,
+          },
+        });
+      }
+
+      const isSimulated =
+        razorpay_order_id.startsWith('order_') &&
+        (razorpay_signature === 'simulated_success_sig' || razorpay_signature.startsWith('mock_sig_'));
+
+      const isValid = signatureVerifier({
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        signature: razorpay_signature,
+        isSimulated,
+      });
+
+      if (!isValid) {
+        donation.status = 'failed';
+        if (typeof donation.save === 'function') await donation.save();
+        return res.status(400).json({ message: 'Invalid payment signature verification' });
+      }
+
+      donation.status = 'completed';
+      donation.razorpayPaymentId = razorpay_payment_id;
+      donation.razorpaySignature = razorpay_signature;
+      if (typeof donation.save === 'function') {
+        await donation.save();
+      }
+
+      // Update AssistanceRequest funded amount
+      if (typeof AssistanceRequestModel.findByIdAndUpdate === 'function') {
+        const updatedRequest = await AssistanceRequestModel.findByIdAndUpdate(
+          donation.requestId,
+          { $inc: { amountFunded: donation.amount } },
+          { new: true }
+        );
+
+        if (
+          updatedRequest &&
+          updatedRequest.amountFunded >= updatedRequest.amountRequested &&
+          updatedRequest.status === REQUEST_STATUS.APPROVED
+        ) {
+          updatedRequest.status = REQUEST_STATUS.FUNDED;
+          if (typeof updatedRequest.save === 'function') {
+            await updatedRequest.save();
+          }
+        }
+      }
+
+      if (typeof AuditLogModel.create === 'function') {
+        await AuditLogModel.create({
+          actorId: donation.donorId || donation.requestId,
+          action: 'DONATION_RECEIVED',
+          targetType: 'AssistanceRequest',
+          targetId: donation.requestId,
+          after: {
+            amount: donation.amount,
+            orderId: razorpay_order_id,
+            paymentId: razorpay_payment_id,
+          },
+          note: `Received Razorpay donation of ₹${donation.amount}`,
+        }).catch(() => {});
+      }
+
+      return res.json({
+        success: true,
+        message: 'Payment verified and donation completed successfully! Thank you for supporting the farmer.',
+        donation: {
+          id: donation._id,
+          amount: donation.amount,
+          currency: donation.currency || 'INR',
+          status: donation.status,
+          razorpayPaymentId: donation.razorpayPaymentId,
+          razorpayOrderId: donation.razorpayOrderId,
+          createdAt: donation.createdAt,
+        },
+      });
+    } catch (error) {
+      console.error('Error verifying donation payment:', error);
+      return res.status(500).json({ message: 'Unable to verify payment' });
     }
   });
 
