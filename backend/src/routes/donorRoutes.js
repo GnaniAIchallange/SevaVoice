@@ -499,7 +499,7 @@ export function createDonorRouter({
         const updatedRequest = await AssistanceRequestModel.findByIdAndUpdate(
           donation.requestId,
           { $inc: { amountFunded: donation.amount } },
-          { new: true }
+          { returnDocument: 'after' }
         );
 
         if (

@@ -224,7 +224,8 @@ test('create-order and verify-payment succeed with valid signature', async () =>
         },
       };
     },
-    async findByIdAndUpdate(id, update) {
+    async findByIdAndUpdate(id, update, options) {
+      assert.deepEqual(options, { returnDocument: 'after' });
       assert.equal(String(id), String(requestId));
       return {
         _id: requestId,
