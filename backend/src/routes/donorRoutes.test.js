@@ -307,3 +307,73 @@ test('create-order and verify-payment succeed with valid signature', async () =>
   );
 });
 
+test('impact-stats returns actual database counts and donation sums', async () => {
+  const verifiedFarmerId = new mongoose.Types.ObjectId();
+
+  const UserModel = {
+    find(query) {
+      return {
+        select() {
+          return {
+            async lean() {
+              return [{ _id: verifiedFarmerId }];
+            },
+          };
+        },
+      };
+    },
+    async countDocuments(query) {
+      if (query.role === ROLES.DONOR) return 14;
+      return 0;
+    },
+  };
+
+  const AssistanceRequestModel = {
+    async countDocuments(query) {
+      if (query.status === REQUEST_STATUS.APPROVED) return 6;
+      return 0;
+    },
+    find(query) {
+      return {
+        select() {
+          return {
+            async lean() {
+              return [{ farmerId: verifiedFarmerId }];
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const DonationModel = {
+    find(query) {
+      return {
+        select() {
+          return {
+            async lean() {
+              return [{ amount: 1500 }, { amount: 3000 }];
+            },
+          };
+        },
+      };
+    },
+  };
+
+  await withDonorServer(
+    { UserModel, AssistanceRequestModel, DonationModel },
+    async (baseUrl) => {
+      const res = await fetch(`${baseUrl}/api/donor/impact-stats`);
+      assert.equal(res.status, 200);
+      const data = await res.json();
+      assert.equal(data.totalDonors, 14);
+      assert.equal(data.totalVerifiedFarmers, 1);
+      assert.equal(data.totalApprovedRequests, 6);
+      assert.equal(data.totalFarmersAssisted, 1);
+      assert.equal(data.totalDonationsAmount, 4500);
+      assert.equal(data.totalDonationsCount, 2);
+    }
+  );
+});
+
+

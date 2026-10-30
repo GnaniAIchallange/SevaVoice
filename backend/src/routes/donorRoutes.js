@@ -70,6 +70,61 @@ export function createDonorRouter({
     return verifiedFarmers.map((f) => f._id);
   }
 
+  // Public Platform Impact Statistics (Actual DB records)
+  router.get('/impact-stats', async (_req, res) => {
+    try {
+      const verifiedFarmerIds = await getVerifiedFarmerIds();
+
+      const [
+        totalDonors,
+        totalVerifiedFarmers,
+        totalApprovedRequests,
+        fundedRequests,
+        completedDonations,
+      ] = await Promise.all([
+        UserModel.countDocuments({ role: ROLES.DONOR, isActive: true }),
+        verifiedFarmerIds.length,
+        AssistanceRequestModel.countDocuments({
+          status: REQUEST_STATUS.APPROVED,
+          farmerId: { $in: verifiedFarmerIds },
+        }),
+        AssistanceRequestModel.find({
+          status: { $in: [REQUEST_STATUS.FUNDED, REQUEST_STATUS.CLOSED] },
+        })
+          .select('farmerId')
+          .lean(),
+        DonationModel.find({
+          status: { $in: ['completed', 'simulated'] },
+        })
+          .select('amount')
+          .lean(),
+      ]);
+
+      // Farmers who received assistance (distinct farmer IDs from funded requests or donations)
+      const farmersAssistedSet = new Set(fundedRequests.map((r) => String(r.farmerId)));
+      const totalFarmersAssisted = farmersAssistedSet.size;
+
+      // Actual completed donation sum
+      const totalDonationsAmount = completedDonations.reduce(
+        (sum, item) => sum + (Number(item.amount) || 0),
+        0
+      );
+      const totalDonationsCount = completedDonations.length;
+
+      return res.json({
+        totalDonors,
+        totalVerifiedFarmers,
+        totalApprovedRequests,
+        totalFarmersAssisted,
+        totalDonationsAmount,
+        totalDonationsCount,
+      });
+    } catch (error) {
+      console.error('Error fetching platform impact stats:', error);
+      return res.status(500).json({ message: 'Unable to load impact statistics' });
+    }
+  });
+
   // Donor overview stats & recent approved requests
   router.get('/overview', optionalAuth, async (req, res) => {
     try {
@@ -85,7 +140,7 @@ export function createDonorRouter({
         AssistanceRequestModel.find(approvedRequestsFilter)
           .populate('farmerId', 'name village district state cropType landSizeAcres farmerVerificationStatus')
           .sort({ createdAt: -1 })
-          .limit(4)
+          .limit(6)
           .lean(),
         req.auth?.userId ? DonationModel.countDocuments({ donorId: req.auth.userId }) : 0,
       ]);
