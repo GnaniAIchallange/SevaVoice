@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
+  ArrowLeft,
   ArrowRight,
   Check,
   Loader2,
@@ -634,18 +635,20 @@ function RegisterFarmer({ onNavigate }) {
   const voiceToggle = (
     <button
       aria-label={voiceGuideEnabled ? "Voice On" : "Voice Off"}
-      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-emerald-900 px-4 py-2 font-bold text-emerald-950 hover:bg-emerald-50"
+      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 font-bold text-text hover:bg-surface-muted transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       onClick={toggleVoiceGuide}
       type="button"
     >
       {voiceGuideEnabled ? (
-        <Volume2 aria-hidden="true" size={22} />
+        <Volume2 aria-hidden="true" size={22} className="text-primary" />
       ) : (
-        <VolumeX aria-hidden="true" size={22} />
+        <VolumeX aria-hidden="true" size={22} className="text-text-muted" />
       )}
-      {voiceGuideEnabled
-        ? actions?.voiceOn || "Voice On"
-        : actions?.voiceOff || "Voice Off"}
+      <span>
+        {voiceGuideEnabled
+          ? actions?.voiceOn || "Voice On"
+          : actions?.voiceOff || "Voice Off"}
+      </span>
     </button>
   );
 
@@ -655,80 +658,81 @@ function RegisterFarmer({ onNavigate }) {
 
       <div className="mb-6 flex items-center justify-between gap-4">
         <RouteLink
-          className="inline-flex min-h-12 items-center rounded-lg px-3 text-base font-semibold text-emerald-950 underline underline-offset-4"
+          className="inline-flex min-h-12 items-center gap-1.5 rounded-lg px-2 text-base font-semibold text-primary underline underline-offset-4 hover:opacity-85"
           to="/"
           onNavigate={onNavigate}
         >
-          {actions?.back || "Back"}
+          <ArrowLeft size={18} aria-hidden="true" />
+          <span>{actions?.back || "Back"}</span>
         </RouteLink>
-        <span className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-950">
+        <span className="rounded-full bg-primary-soft text-primary-soft-text px-4 py-1.5 text-sm font-bold border border-primary/20">
           {actions?.title || "Farmer registration"}
         </span>
       </div>
 
       {phase === "language" ? (
-        <div className="rounded-3xl border-2 border-emerald-900 bg-white p-6 shadow-sm sm:p-10">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="flex items-center gap-3 text-3xl font-extrabold leading-tight text-emerald-950 sm:text-4xl">
-              <Languages aria-hidden="true" size={32} />
+        <div className="rounded-3xl border border-border bg-surface p-6 shadow-xs sm:p-10">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="flex items-center gap-3 text-3xl font-extrabold leading-tight text-text sm:text-4xl font-serif">
+              <Languages aria-hidden="true" size={32} className="text-primary" />
               Choose your language
             </h1>
             {voiceToggle}
           </div>
-          <p className="mb-8 text-lg text-slate-800">
+          <p className="mb-8 text-lg text-text-muted">
             भाषा निवडा · भाषा चुनें
           </p>
           <div className="grid gap-4">
             {Object.entries(FARMER_REGISTRATION_LANGUAGES).map(
               ([code, config]) => (
                 <button
-                  className="min-h-16 rounded-2xl border-2 border-emerald-900 bg-emerald-50 px-6 py-4 text-left text-2xl font-bold text-emerald-950 transition hover:bg-emerald-100 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
+                  className="min-h-16 rounded-2xl border-2 border-border bg-surface-muted px-6 py-4 text-left text-2xl font-bold text-text transition hover:border-primary hover:bg-primary-soft hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
                   key={code}
                   onClick={() => void chooseLanguage(code)}
                   type="button"
                 >
                   <span className="flex items-center gap-3">
-                    <Sprout aria-hidden="true" size={26} />
+                    <Sprout aria-hidden="true" size={26} className="text-primary" />
                     {config.name}
                   </span>
                 </button>
               ),
             )}
           </div>
-          <p className="mt-6 text-base text-slate-800">
+          <p className="mt-6 text-base text-text-muted">
             Allow microphone access when asked. / पूछे जाने पर माइक्रोफ़ोन की अनुमति दें।
           </p>
         </div>
       ) : phase === "done" ? (
-        <div className="rounded-3xl border-2 border-emerald-900 bg-white p-6 shadow-sm sm:p-10">
-          <p className="mb-3 text-lg font-bold text-emerald-800">
+        <div className="rounded-3xl border border-border bg-surface p-6 shadow-xs sm:p-10">
+          <p className="mb-3 text-lg font-bold text-primary">
             {languageConfig.done}
           </p>
           {status && (
-            <p className="mb-4 rounded-xl bg-amber-50 p-4 text-base font-semibold text-slate-950" role="status">
+            <p className="mb-4 rounded-xl border border-warning/30 bg-warning-soft p-4 text-base font-semibold text-warning-soft-text" role="status">
               {status}
             </p>
           )}
-          <h1 className="mb-6 text-3xl font-extrabold text-emerald-950">
+          <h1 className="mb-6 text-3xl font-extrabold text-text font-serif">
             {languageConfig.actions.completeTitle}
           </h1>
           <dl className="space-y-4">
             {FARMER_REGISTRATION_FIELDS.map((answerField) => (
               <div
-                className="grid gap-1 border-b border-slate-300 pb-3 sm:grid-cols-[12rem_1fr]"
+                className="grid gap-1 border-b border-border pb-3 sm:grid-cols-[12rem_1fr]"
                 key={answerField}
               >
-                <dt className="font-bold text-slate-900">
+                <dt className="font-bold text-text">
                   {languageConfig.steps[answerField].label}
                 </dt>
-                <dd className="break-words text-slate-800">
+                <dd className="break-words text-text-muted">
                   {answers[answerField]}
                 </dd>
               </div>
             ))}
           </dl>
           <button
-            className="mt-6 min-h-14 rounded-xl border-2 border-emerald-950 bg-emerald-800 px-5 py-3 text-lg font-extrabold text-white hover:bg-emerald-900"
+            className="mt-6 min-h-14 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover px-5 py-3 text-lg font-extrabold transition-colors cursor-pointer shadow-xs"
             onClick={() => onNavigate("/login")}
             type="button"
           >
@@ -736,14 +740,14 @@ function RegisterFarmer({ onNavigate }) {
           </button>
         </div>
       ) : phase === "documents" ? (
-        <div className="rounded-3xl border-2 border-emerald-900 bg-white p-5 shadow-sm sm:p-10">
-          <h1 className="mb-3 text-3xl font-extrabold text-emerald-950">
+        <div className="rounded-3xl border border-border bg-surface p-5 shadow-xs sm:p-10">
+          <h1 className="mb-3 text-3xl font-extrabold text-text font-serif">
             Upload required documents
           </h1>
-          <p className="mb-5 text-lg text-slate-900">{languageConfig.documentGuide}</p>
+          <p className="mb-5 text-lg text-text-muted">{languageConfig.documentGuide}</p>
           <div className="mb-6 flex flex-wrap gap-3">
             <button
-              className="min-h-12 rounded-xl border-2 border-emerald-900 px-4 py-2 font-bold text-emerald-950 hover:bg-emerald-50 disabled:opacity-50"
+              className="min-h-12 rounded-xl border border-border bg-surface-muted px-4 py-2 font-bold text-text hover:bg-border/60 disabled:opacity-50 cursor-pointer transition-colors"
               disabled={isDocumentVoiceBusy || isSubmitting}
               onClick={() => void speakDocumentGuide()}
               type="button"
@@ -751,10 +755,10 @@ function RegisterFarmer({ onNavigate }) {
               {languageConfig.actions.replay}
             </button>
             <button
-              className={`min-h-12 rounded-xl border-2 px-4 py-2 font-bold disabled:opacity-50 ${
+              className={`min-h-12 rounded-xl border-2 px-4 py-2 font-bold disabled:opacity-50 cursor-pointer transition-colors ${
                 documentVoicePhase === "recording"
-                  ? "border-red-900 bg-red-800 text-white"
-                  : "border-emerald-900 text-emerald-950 hover:bg-emerald-50"
+                  ? "border-danger bg-danger text-danger-foreground animate-pulse"
+                  : "border-primary bg-primary-soft text-primary-soft-text hover:bg-primary hover:text-primary-foreground"
               }`}
               disabled={
                 isSubmitting ||
@@ -774,76 +778,76 @@ function RegisterFarmer({ onNavigate }) {
           </div>
           {documentVoiceStatus && (
             <p
-              className="mb-5 rounded-xl border-2 border-amber-700 bg-amber-50 p-4 font-semibold text-slate-950"
+              className="mb-5 rounded-xl border border-warning/30 bg-warning-soft p-4 font-semibold text-warning-soft-text"
               role="status"
             >
               {documentVoiceStatus}
             </p>
           )}
-          <p className="mb-6 text-base text-slate-800">
+          <p className="mb-6 text-sm text-text-muted">
             PDF, JPG, JPEG, or PNG only. Maximum 8 MB per file. Documents are
             stored privately and reviewed by an authorized verifier.
           </p>
           <form className="grid gap-5" onSubmit={submitRegistration}>
-            <label className="grid gap-2 font-bold text-slate-950" htmlFor="aadhaar-document">
+            <label className="grid gap-2 font-bold text-text text-left" htmlFor="aadhaar-document">
               Aadhaar card (required)
               <input
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                className="min-h-12 rounded-xl border-2 border-slate-600 p-3"
+                className="min-h-12 rounded-xl border border-border bg-surface text-text p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 id="aadhaar-document"
                 name="aadhaarDocument"
                 onChange={updateDocumentFiles}
                 required
                 type="file"
               />
-              <span className="text-sm font-normal text-slate-700">
+              <span className="text-sm font-normal text-text-muted">
                 {documentFiles.aadhaarDocument
                   ? `Selected: ${documentFiles.aadhaarDocument.name}`
                   : "No file selected"}
               </span>
             </label>
 
-            <label className="grid gap-2 font-bold text-slate-950" htmlFor="land-document">
+            <label className="grid gap-2 font-bold text-text text-left" htmlFor="land-document">
               Land ownership / property certificate (required)
               <input
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                className="min-h-12 rounded-xl border-2 border-slate-600 p-3"
+                className="min-h-12 rounded-xl border border-border bg-surface text-text p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 id="land-document"
                 name="landDocument"
                 onChange={updateDocumentFiles}
                 required
                 type="file"
               />
-              <span className="text-sm font-normal text-slate-700">
+              <span className="text-sm font-normal text-text-muted">
                 {documentFiles.landDocument
                   ? `Selected: ${documentFiles.landDocument.name}`
                   : "No file selected"}
               </span>
             </label>
 
-            <label className="grid gap-2 font-bold text-slate-950" htmlFor="supporting-documents">
+            <label className="grid gap-2 font-bold text-text text-left" htmlFor="supporting-documents">
               Additional Supporting Documents (Optional)
               <input
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                className="min-h-12 rounded-xl border-2 border-slate-600 p-3"
+                className="min-h-12 rounded-xl border border-border bg-surface text-text p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 id="supporting-documents"
                 multiple
                 name="supportingDocuments"
                 onChange={updateDocumentFiles}
                 type="file"
               />
-              <span className="text-sm font-normal text-slate-700">
+              <span className="text-sm font-normal text-text-muted">
                 {documentFiles.supportingDocuments.length
                   ? `${documentFiles.supportingDocuments.length} file(s) selected`
                   : "Up to 5 files"}
               </span>
             </label>
 
-            <label className="grid gap-2 font-bold text-slate-950" htmlFor="farmer-password">
+            <label className="grid gap-2 font-bold text-text text-left" htmlFor="farmer-password">
               Create password
               <input
                 autoComplete="new-password"
-                className="min-h-12 rounded-xl border-2 border-slate-600 p-3"
+                className="min-h-12 rounded-xl border border-border bg-surface text-text p-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 id="farmer-password"
                 maxLength={72}
                 minLength={8}
@@ -853,11 +857,11 @@ function RegisterFarmer({ onNavigate }) {
                 value={password}
               />
             </label>
-            <label className="grid gap-2 font-bold text-slate-950" htmlFor="farmer-confirm-password">
+            <label className="grid gap-2 font-bold text-text text-left" htmlFor="farmer-confirm-password">
               Confirm password
               <input
                 autoComplete="new-password"
-                className="min-h-12 rounded-xl border-2 border-slate-600 p-3"
+                className="min-h-12 rounded-xl border border-border bg-surface text-text p-3 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 id="farmer-confirm-password"
                 maxLength={72}
                 minLength={8}
@@ -869,12 +873,12 @@ function RegisterFarmer({ onNavigate }) {
             </label>
 
             {status && (
-              <p className="rounded-xl border-2 border-amber-700 bg-amber-50 p-4 font-semibold text-slate-950" role="status">
+              <p className="rounded-xl border border-warning/30 bg-warning-soft p-4 font-semibold text-warning-soft-text" role="status">
                 {status}
               </p>
             )}
             <button
-              className="min-h-14 rounded-xl border-2 border-emerald-950 bg-emerald-800 px-5 py-3 text-lg font-extrabold text-white hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-14 rounded-xl bg-primary text-primary-foreground hover:bg-primary-hover px-5 py-3 text-lg font-extrabold transition-colors shadow-xs disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               disabled={isSubmitting}
               type="submit"
             >
@@ -883,24 +887,24 @@ function RegisterFarmer({ onNavigate }) {
           </form>
         </div>
       ) : (
-        <div className="rounded-3xl border-2 border-emerald-900 bg-white p-5 shadow-sm sm:p-10">
+        <div className="rounded-3xl border border-border bg-surface p-5 shadow-xs sm:p-10">
           <div className="mb-7">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
-              <p className="text-lg font-extrabold text-emerald-950">
+              <p className="text-lg font-extrabold text-primary">
                 {stepIndex + 1} / {FARMER_REGISTRATION_FIELDS.length}
               </p>
               {voiceToggle}
             </div>
             <div
               aria-label={`Question ${stepIndex + 1} of ${FARMER_REGISTRATION_FIELDS.length}`}
-              className="h-3 overflow-hidden rounded-full bg-slate-200"
+              className="h-3 overflow-hidden rounded-full bg-surface-muted border border-border/40"
               role="progressbar"
               aria-valuemin={1}
               aria-valuemax={FARMER_REGISTRATION_FIELDS.length}
               aria-valuenow={stepIndex + 1}
             >
               <div
-                className="h-full rounded-full bg-emerald-800 transition-all"
+                className="h-full rounded-full bg-primary transition-all duration-300"
                 style={{
                   width: `${((stepIndex + 1) / FARMER_REGISTRATION_FIELDS.length) * 100}%`,
                 }}
@@ -909,24 +913,24 @@ function RegisterFarmer({ onNavigate }) {
           </div>
 
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <p className="flex-1 text-2xl font-extrabold leading-snug text-slate-950 sm:text-3xl">
+            <p className="flex-1 text-2xl font-extrabold leading-snug text-text sm:text-3xl font-serif">
               {step.prompt}
             </p>
             <button
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-emerald-900 px-4 py-2 font-bold text-emerald-950 hover:bg-emerald-50"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border bg-surface-muted px-4 py-2 font-bold text-text hover:bg-border/60 transition-colors cursor-pointer"
               onClick={() => listenTo(step.prompt)}
               type="button"
             >
-              <Volume2 aria-hidden="true" size={22} />
-              {actions.listen}
+              <Volume2 aria-hidden="true" size={22} className="text-primary" />
+              <span>{actions.listen}</span>
             </button>
           </div>
 
           <button
-            className={`mb-6 min-h-16 w-full rounded-2xl border-2 px-5 py-4 text-xl font-extrabold text-white focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-amber-500 disabled:cursor-not-allowed disabled:opacity-60 ${
+            className={`mb-6 min-h-18 w-full rounded-2xl border-2 px-5 py-4 text-xl font-extrabold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 transition-all cursor-pointer shadow-md ${
               phase === "recording"
-                ? "border-red-900 bg-red-800 hover:bg-red-900"
-                : "border-emerald-950 bg-emerald-800 hover:bg-emerald-900"
+                ? "border-danger bg-danger text-danger-foreground animate-pulse"
+                : "border-primary bg-primary text-primary-foreground hover:bg-primary-hover active:scale-[0.99]"
             }`}
             aria-label={microphoneLabel}
             disabled={isSubmitting || ["requesting", "transcribing"].includes(phase)}
@@ -934,25 +938,25 @@ function RegisterFarmer({ onNavigate }) {
             type="button"
           >
             {phase === "recording" ? (
-              <Square aria-hidden="true" className="mr-2 inline" size={22} />
+              <Square aria-hidden="true" className="mr-2 inline" size={24} />
             ) : phase === "requesting" || phase === "transcribing" ? (
               <Loader2
                 aria-hidden="true"
                 className="mr-2 inline animate-spin"
-                size={22}
+                size={24}
               />
             ) : (
-              <Mic aria-hidden="true" className="mr-2 inline" size={22} />
+              <Mic aria-hidden="true" className="mr-2 inline" size={24} />
             )}
-            {microphoneLabel}
+            <span>{microphoneLabel}</span>
           </button>
 
           <label
-            className="mb-2 flex items-center gap-2 text-lg font-bold text-slate-950"
+            className="mb-2 flex items-center gap-2 text-lg font-bold text-text"
             htmlFor="farmer-answer"
           >
-            <FieldIcon aria-hidden="true" size={22} />
-            {step.label}
+            <FieldIcon aria-hidden="true" size={22} className="text-primary" />
+            <span>{step.label}</span>
           </label>
           <input
             autoComplete={field === "phone" ? "tel" : "off"}
@@ -963,10 +967,10 @@ function RegisterFarmer({ onNavigate }) {
               .filter(Boolean)
               .join(" ") || undefined}
             aria-invalid={Boolean(validationMessage)}
-            className={`min-h-14 w-full rounded-xl border-2 bg-white px-4 py-3 text-xl text-slate-950 placeholder:text-slate-500 focus:outline-4 focus:outline-emerald-200 ${
+            className={`min-h-14 w-full rounded-xl border-2 bg-surface px-4 py-3 text-xl text-text placeholder:text-text-muted/60 transition-colors focus-visible:outline-none ${
               validationMessage
-                ? "border-red-700 focus:border-red-700"
-                : "border-slate-700 focus:border-emerald-800"
+                ? "border-danger focus-visible:border-danger focus-visible:ring-2 focus-visible:ring-danger"
+                : "border-border focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary"
             }`}
             id="farmer-answer"
             disabled={isSubmitting}
@@ -985,7 +989,7 @@ function RegisterFarmer({ onNavigate }) {
           {field === "phone" && (
             <p
               className={`mt-2 text-sm font-semibold ${
-                phoneDigits > 10 ? "text-red-700" : "text-slate-700"
+                phoneDigits > 10 ? "text-danger" : "text-text-muted"
               }`}
               id="farmer-phone-counter"
             >
@@ -994,17 +998,17 @@ function RegisterFarmer({ onNavigate }) {
           )}
 
           {answerSource === "voice" && value && (
-            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border-2 border-sky-700 bg-sky-50 p-4">
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-info/40 bg-info-soft p-4">
               <p
-                className="flex min-h-12 flex-1 items-center gap-2 font-semibold text-sky-950"
+                className="flex min-h-12 flex-1 items-center gap-2 font-semibold text-info-soft-text"
                 data-testid="voice-confirmation"
               >
-                <Check aria-hidden="true" size={22} />
-                {actions.checkHeard}: <span className="break-all">{value}</span>
+                <Check aria-hidden="true" size={22} className="text-info shrink-0" />
+                <span>{actions.checkHeard}: <strong className="break-all">{value}</strong></span>
               </p>
               <button
                 aria-label={actions.listen}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-sky-900 px-3 py-2 font-bold text-sky-950"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-info/40 bg-surface/50 px-3 py-2 font-bold text-info-soft-text hover:bg-surface cursor-pointer"
                 onClick={() => {
                   const spoken =
                     field === "phone" ? phoneReadback(value, language) : value;
@@ -1013,15 +1017,15 @@ function RegisterFarmer({ onNavigate }) {
                 type="button"
               >
                 <Volume2 aria-hidden="true" size={20} />
-                {actions.listen}
+                <span>{actions.listen}</span>
               </button>
               <button
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border-2 border-sky-900 px-3 py-2 font-bold text-sky-950"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-info/40 bg-surface/50 px-3 py-2 font-bold text-info-soft-text hover:bg-surface cursor-pointer"
                 onClick={handleMicrophone}
                 type="button"
               >
                 <Mic aria-hidden="true" size={20} />
-                {actions.speakAgain}
+                <span>{actions.speakAgain}</span>
               </button>
             </div>
           )}
@@ -1029,49 +1033,49 @@ function RegisterFarmer({ onNavigate }) {
           {validationMessage && (
             <div
               aria-live="polite"
-              className="mt-3 flex flex-wrap items-center gap-2 text-base font-semibold text-red-800"
+              className="mt-3 flex flex-wrap items-center gap-2 text-base font-semibold text-danger p-3.5 rounded-xl bg-danger-soft border border-danger/30"
               id="farmer-answer-error"
               role="alert"
               data-validation-code={validationErrorCode}
             >
-              <AlertCircle aria-hidden="true" size={20} />
+              <AlertCircle aria-hidden="true" size={20} className="shrink-0" />
               <span className="flex-1">{validationMessage.visual}</span>
               <button
                 aria-label={actions.listen}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 border-red-800 px-3 py-2 text-red-900"
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-danger/40 bg-surface/50 px-3 py-2 text-danger hover:bg-surface cursor-pointer"
                 onClick={() => listenTo(validationMessage.spoken)}
                 type="button"
               >
                 <Volume2 aria-hidden="true" size={20} />
-                {actions.listen}
+                <span>{actions.listen}</span>
               </button>
             </div>
           )}
 
           {status && (
-            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border-2 border-amber-700 bg-amber-50 p-4 text-base font-semibold text-slate-950">
-              <AlertCircle aria-hidden="true" size={20} />
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/30 bg-warning-soft p-4 text-base font-semibold text-warning-soft-text">
+              <AlertCircle aria-hidden="true" size={20} className="shrink-0" />
               <p className="flex-1" role="status">{status}</p>
               <button
                 aria-label={actions.listen}
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg border-2 border-amber-900 px-3 py-2"
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg border border-warning/40 bg-surface/50 px-3 py-2 text-warning-soft-text hover:bg-surface cursor-pointer"
                 onClick={() => listenTo(status)}
                 type="button"
               >
                 <Volume2 aria-hidden="true" size={20} />
-                {actions.listen}
+                <span>{actions.listen}</span>
               </button>
             </div>
           )}
 
           <button
-            className="mt-5 inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-emerald-950 bg-emerald-100 px-5 py-3 text-lg font-extrabold text-emerald-950 hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-6 inline-flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-primary text-primary-foreground hover:bg-primary-hover px-5 py-4 text-xl font-extrabold disabled:cursor-not-allowed disabled:opacity-50 transition-all cursor-pointer shadow-md active:scale-[0.99]"
             disabled={isSubmitting}
             onClick={() => void proceedToNextStep()}
             type="button"
           >
+            <span>{actions.proceed}</span>
             <ArrowRight aria-hidden="true" size={24} />
-            {actions.proceed}
           </button>
         </div>
       )}

@@ -165,7 +165,7 @@ export default function Donor({ user }) {
             <span className="donor-stat-label">Trust & Verification</span>
             <span className="donor-stat-icon"><ShieldCheck size={18} /></span>
           </div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#065f46', marginTop: '6px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-success)', marginTop: '6px' }}>
             100% Aadhaar & Land Verified
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function Donor({ user }) {
               </form>
 
               <div className="sort-wrapper">
-                <ArrowUpDown size={15} style={{ color: '#64748b', flexShrink: 0 }} />
+                <ArrowUpDown size={15} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
                 <select
                   className="filter-select"
                   value={sort}
@@ -262,10 +262,10 @@ export default function Donor({ user }) {
               <p>Loading approved assistance requests...</p>
             </div>
           ) : requests.length === 0 ? (
-            <div className="empty-state" style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '64px 20px' }}>
-              <FileText size={32} style={{ color: '#1d684b' }} />
-              <h3 style={{ margin: '8px 0 4px 0', color: '#153f32', fontFamily: 'Georgia, serif' }}>No Approved Requests Available</h3>
-              <p style={{ margin: 0, color: '#64748b' }}>
+            <div className="empty-state" style={{ background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-border)', padding: '64px 20px' }}>
+              <FileText size={32} style={{ color: 'var(--color-primary)' }} />
+              <h3 style={{ margin: '8px 0 4px 0', color: 'var(--color-text)' }}>No Approved Requests Available</h3>
+              <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
                 There are currently no published requests matching your filter criteria. Check back soon as verifiers approve new applications.
               </p>
             </div>
@@ -282,7 +282,7 @@ export default function Donor({ user }) {
                     <div>
                       <div className="request-card-header">
                         <span className="category-pill">{item.category}</span>
-                        <span style={{ fontSize: '12px', color: '#64748b', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <Calendar size={12} />
                           {new Date(item.createdAt).toLocaleDateString()}
                         </span>
@@ -296,7 +296,7 @@ export default function Donor({ user }) {
                       <h3 className="request-card-title">{item.title}</h3>
 
                       <div className="request-card-farmer">
-                        <MapPin size={13} style={{ color: '#1d684b', flexShrink: 0 }} />
+                        <MapPin size={13} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                         <span>By <strong>{item.farmer?.name}</strong> &bull; {[item.farmer?.village, item.farmer?.district, item.farmer?.state].filter(Boolean).join(', ')}</span>
                       </div>
 
@@ -309,13 +309,13 @@ export default function Donor({ user }) {
                       {/* Funding Progress */}
                       <div className="funding-progress-box">
                         <div className="funding-numbers">
-                          <span>Goal: <strong style={{ color: '#153f32' }}>₹{Number(item.amountRequested).toLocaleString()}</strong></span>
-                          <span>Raised: <strong style={{ color: '#059669' }}>₹{Number(item.amountFunded || 0).toLocaleString()}</strong></span>
+                          <span>Goal: <strong style={{ color: 'var(--color-text)' }}>₹{Number(item.amountRequested).toLocaleString()}</strong></span>
+                          <span>Raised: <strong style={{ color: 'var(--color-success)' }}>₹{Number(item.amountFunded || 0).toLocaleString()}</strong></span>
                         </div>
                         <div className="progress-bar-bg">
                           <div className="progress-bar-fill" style={{ width: `${percentFunded}%` }} />
                         </div>
-                        <div style={{ fontSize: '11px', color: '#64748b', marginTop: '6px', textAlign: 'right' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '6px', textAlign: 'right' }}>
                           Remaining: ₹{Number(item.remainingGoal || 0).toLocaleString()}
                         </div>
                       </div>
@@ -357,7 +357,7 @@ export default function Donor({ user }) {
               >
                 <ChevronLeft size={16} /> Previous
               </button>
-              <span style={{ fontSize: '13px', color: '#64748b' }}>
+              <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
                 Page {page} of {pagination.totalPages}
               </span>
               <button
@@ -383,11 +383,11 @@ export default function Donor({ user }) {
             </div>
           ) : history.length === 0 ? (
             <div className="history-empty-note">
-              <Gift size={32} style={{ color: '#1d684b' }} />
-              <h3 style={{ margin: 0, color: '#153f32', fontFamily: 'Georgia, serif' }}>
+              <Gift size={32} style={{ color: 'var(--color-primary)' }} />
+              <h3 style={{ margin: 0, color: 'var(--color-text)' }}>
                 No Contribution Records Yet
               </h3>
-              <p style={{ margin: 0, fontSize: '14px', color: '#64748b', maxWidth: '500px' }}>
+              <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-muted)', maxWidth: '500px' }}>
                 You have not made any recorded donations yet. When online payment transactions are processed in future updates, your verified receipts and impact updates will appear here.
               </p>
               <button
@@ -419,7 +419,7 @@ export default function Donor({ user }) {
                         <td>{new Date(record.date).toLocaleDateString()}</td>
                         <td><strong>{record.request?.title || 'Assistance Request'}</strong></td>
                         <td>{record.request?.farmerName} ({record.request?.location})</td>
-                        <td style={{ fontWeight: 700, color: '#153f32' }}>
+                        <td style={{ fontWeight: 700, color: 'var(--color-text)' }}>
                           ₹{Number(record.amount).toLocaleString()}
                         </td>
                         <td>
@@ -439,10 +439,10 @@ export default function Donor({ user }) {
                   <article className="mobile-data-card" key={record.id}>
                     <div className="mobile-data-card-header">
                       <div>
-                        <strong style={{ fontSize: '15px', color: '#153f32' }}>
+                        <strong style={{ fontSize: '15px', color: 'var(--color-text)' }}>
                           {record.request?.title || 'Assistance Request'}
                         </strong>
-                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                           {new Date(record.date).toLocaleDateString()}
                         </div>
                       </div>
@@ -458,7 +458,7 @@ export default function Donor({ user }) {
 
                     <div className="mobile-data-card-row">
                       <span>Contributed Amount</span>
-                      <strong style={{ color: '#153f32', fontSize: '16px' }}>
+                      <strong style={{ color: 'var(--color-text)', fontSize: '16px' }}>
                         ₹{Number(record.amount).toLocaleString()}
                       </strong>
                     </div>

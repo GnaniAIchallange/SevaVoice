@@ -83,7 +83,9 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
     setVoiceGuideEnabled(nextVal);
     try {
       window.localStorage.setItem(VOICE_PREFERENCE_KEY, nextVal ? "on" : "off");
-    } catch {}
+    } catch {
+      // Storage unavailable
+    }
   }
 
   // Check if identity/land fields changed
@@ -145,24 +147,24 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
   }
 
   return (
-    <div className="space-y-6 pb-24 max-w-2xl mx-auto px-4 pt-2">
+    <div className="space-y-6 pb-24 max-w-2xl mx-auto px-4 pt-4">
       {/* Top Header */}
-      <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+      <div className="flex items-center gap-3 border-b border-border pb-4">
         {onBack && (
           <button
             onClick={onBack}
             type="button"
-            className="p-2 text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 rounded-full border border-slate-200 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
+            className="p-2.5 text-text-muted hover:text-primary bg-surface hover:bg-surface-muted rounded-2xl border border-border min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         )}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text font-serif">
             {t.profile.pageTitle}
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-text-muted mt-0.5">
             {t.profile.subtitle}
           </p>
         </div>
@@ -170,29 +172,29 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-8 text-center min-h-[250px]" role="status">
-          <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mb-3" />
-          <p className="text-base text-slate-600">{t.common.loading}</p>
+          <RefreshCw className="w-8 h-8 text-primary animate-spin mb-3" />
+          <p className="text-base text-text-muted">{t.common.loading}</p>
         </div>
       ) : (
         <form onSubmit={handleFormSubmit} className="space-y-6">
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-sm text-rose-800 flex items-start gap-2.5" role="alert">
-              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <div className="p-4 bg-danger-soft border border-danger/30 rounded-2xl text-sm text-danger-soft-text flex items-start gap-2.5" role="alert">
+              <AlertTriangle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-sm text-emerald-800 flex items-start gap-2.5" role="alert">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="p-4 bg-success-soft border border-success/30 rounded-2xl text-sm text-success-soft-text flex items-start gap-2.5" role="alert">
+              <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
               <span>{success}</span>
             </div>
           )}
 
           {/* Preferences Section: Language & Voice Guide */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-emerald-600" />
+          <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-4">
+            <h2 className="text-base font-bold text-text flex items-center gap-2">
+              <Globe className="w-5 h-5 text-primary" />
               <span>{t.profile.preferredLang}</span>
             </h2>
 
@@ -206,10 +208,10 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                   key={code}
                   type="button"
                   onClick={() => setPreferredLanguage(code)}
-                  className={`py-3 px-2 rounded-xl text-sm font-bold border min-h-[48px] flex items-center justify-center transition-colors ${
+                  className={`py-3 px-2 rounded-xl text-sm font-bold border min-h-[48px] flex items-center justify-center transition-colors cursor-pointer ${
                     preferredLanguage === code
-                      ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
-                      : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                      ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                      : "bg-surface-muted text-text-muted border-border hover:bg-surface hover:text-text"
                   }`}
                 >
                   {label}
@@ -218,18 +220,18 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
             </div>
 
             {/* Default Voice Guide Toggle */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+            <div className="pt-3 border-t border-border flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 {voiceGuideEnabled ? (
-                  <Volume2 className="w-5 h-5 text-emerald-600" />
+                  <Volume2 className="w-5 h-5 text-primary" />
                 ) : (
-                  <VolumeX className="w-5 h-5 text-slate-400" />
+                  <VolumeX className="w-5 h-5 text-text-muted" />
                 )}
                 <div>
-                  <p className="text-sm font-bold text-slate-900">
+                  <p className="text-sm font-bold text-text">
                     {t.profile.voiceDefault}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-text-muted">
                     {voiceGuideEnabled ? "Auto-play voice on" : "Muted by default"}
                   </p>
                 </div>
@@ -238,10 +240,10 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
               <button
                 type="button"
                 onClick={toggleVoicePreference}
-                className={`py-2 px-4 rounded-full text-xs font-bold border transition-colors min-h-[44px] ${
+                className={`py-2 px-4 rounded-full text-xs font-bold border transition-colors min-h-[44px] cursor-pointer ${
                   voiceGuideEnabled
-                    ? "bg-emerald-50 text-emerald-800 border-emerald-300"
-                    : "bg-slate-100 text-slate-600 border-slate-300"
+                    ? "bg-primary-soft text-primary-soft-text border-primary/30"
+                    : "bg-surface-muted text-text-muted border-border"
                 }`}
               >
                 {voiceGuideEnabled ? "ON" : "OFF"}
@@ -250,15 +252,15 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
           </div>
 
           {/* Farm & Location Details */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Sprout className="w-5 h-5 text-emerald-600" />
+          <div className="bg-surface p-5 rounded-2xl border border-border shadow-xs space-y-4">
+            <h2 className="text-base font-bold text-text flex items-center gap-2">
+              <Sprout className="w-5 h-5 text-primary" />
               <span>{t.profile.farmDetailsTitle}</span>
             </h2>
 
             {/* Readonly Phone */}
             <div>
-              <label htmlFor="farmer-phone" className="block text-xs font-bold text-slate-600 mb-1">
+              <label htmlFor="farmer-phone" className="block text-xs font-bold text-text-muted mb-1">
                 {t.profile.phone} (Permanent ID)
               </label>
               <input
@@ -266,13 +268,13 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                 type="text"
                 value={phone}
                 disabled
-                className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-mono text-base min-h-[48px] cursor-not-allowed"
+                className="w-full px-4 py-3 bg-surface-muted border border-border rounded-xl text-text-muted font-mono text-base min-h-[48px] cursor-not-allowed opacity-80"
               />
             </div>
 
             {/* Name */}
             <div>
-              <label htmlFor="farmer-name" className="block text-xs font-bold text-slate-600 mb-1">
+              <label htmlFor="farmer-name" className="block text-xs font-bold text-text mb-1">
                 {t.profile.name}
               </label>
               <input
@@ -281,13 +283,13 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-base min-h-[48px] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-3 bg-surface-muted border border-border rounded-xl text-text text-base min-h-[48px] focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             {/* Primary Crop (Safe field) */}
             <div>
-              <label htmlFor="farmer-crop" className="block text-xs font-bold text-slate-600 mb-1">
+              <label htmlFor="farmer-crop" className="block text-xs font-bold text-text mb-1">
                 {t.profile.crop}
               </label>
               <input
@@ -296,13 +298,13 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                 value={cropType}
                 onChange={(e) => setCropType(e.target.value)}
                 placeholder="e.g. Wheat, Sugarcane, Cotton"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-base min-h-[48px] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-3 bg-surface-muted border border-border rounded-xl text-text text-base min-h-[48px] focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             {/* Land Size (Acres) */}
             <div>
-              <label htmlFor="farmer-acres" className="block text-xs font-bold text-slate-600 mb-1">
+              <label htmlFor="farmer-acres" className="block text-xs font-bold text-text mb-1">
                 {t.profile.acres}
               </label>
               <input
@@ -314,14 +316,14 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                 value={landSizeAcres}
                 onChange={(e) => setLandSizeAcres(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-base min-h-[48px] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-3 bg-surface-muted border border-border rounded-xl text-text text-base min-h-[48px] focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             {/* Location fields */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label htmlFor="farmer-village" className="block text-xs font-bold text-slate-600 mb-1">
+                <label htmlFor="farmer-village" className="block text-xs font-bold text-text mb-1">
                   {t.profile.village}
                 </label>
                 <input
@@ -330,12 +332,12 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                   value={village}
                   onChange={(e) => setVillage(e.target.value)}
                   required
-                  className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-base min-h-[48px] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-3 bg-surface-muted border border-border rounded-xl text-text text-base min-h-[48px] focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
               <div>
-                <label htmlFor="farmer-district" className="block text-xs font-bold text-slate-600 mb-1">
+                <label htmlFor="farmer-district" className="block text-xs font-bold text-text mb-1">
                   {t.profile.district}
                 </label>
                 <input
@@ -344,12 +346,12 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
                   required
-                  className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-base min-h-[48px] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-3 bg-surface-muted border border-border rounded-xl text-text text-base min-h-[48px] focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
               <div>
-                <label htmlFor="farmer-state" className="block text-xs font-bold text-slate-600 mb-1">
+                <label htmlFor="farmer-state" className="block text-xs font-bold text-text mb-1">
                   {t.profile.state}
                 </label>
                 <input
@@ -358,7 +360,7 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
                   value={state}
                   onChange={(e) => setState(e.target.value)}
                   required
-                  className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-base min-h-[48px] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-3 bg-surface-muted border border-border rounded-xl text-text text-base min-h-[48px] focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -368,7 +370,7 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-4 px-6 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold text-base rounded-2xl shadow-md flex items-center justify-center gap-2 min-h-[52px] cursor-pointer transition-all active:scale-98"
+            className="w-full py-4 px-6 bg-primary hover:bg-primary-hover disabled:bg-surface-muted disabled:text-text-muted text-primary-foreground font-bold text-base rounded-2xl shadow-md flex items-center justify-center gap-2 min-h-[52px] cursor-pointer transition-all active:scale-98"
           >
             {saving ? (
               <>
@@ -393,15 +395,15 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
           aria-modal="true"
           aria-labelledby="warning-modal-title"
         >
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-rose-200">
-            <div className="flex items-center gap-3 text-rose-600 mb-3">
+          <div className="bg-surface text-text rounded-3xl p-6 w-full max-w-md shadow-2xl border border-danger/30 max-h-[90dvh] overflow-y-auto">
+            <div className="flex items-center gap-3 text-danger mb-3">
               <ShieldAlert className="w-8 h-8 shrink-0" />
-              <h2 id="warning-modal-title" className="text-lg font-bold text-slate-900">
+              <h2 id="warning-modal-title" className="text-lg font-bold text-text font-serif">
                 {t.profile.warningModalTitle}
               </h2>
             </div>
 
-            <p className="text-sm text-slate-700 leading-relaxed mb-6">
+            <p className="text-sm text-text-muted leading-relaxed mb-6">
               {t.profile.warningModalDesc}
             </p>
 
@@ -409,14 +411,14 @@ export default function FarmerProfile({ user, onProfileUpdated, onBack }) {
               <button
                 type="button"
                 onClick={() => setShowWarningModal(false)}
-                className="flex-1 py-3 px-4 border border-slate-300 text-slate-700 font-semibold text-sm rounded-xl min-h-[44px]"
+                className="flex-1 py-3 px-4 border border-border text-text-muted font-semibold text-sm rounded-xl min-h-[44px] hover:bg-surface-muted cursor-pointer"
               >
                 {t.profile.cancelWarningBtn}
               </button>
               <button
                 type="button"
                 onClick={executeSave}
-                className="flex-1 py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl min-h-[44px] shadow-xs"
+                className="flex-1 py-3 px-4 bg-danger hover:opacity-90 text-danger-foreground font-bold text-sm rounded-xl min-h-[44px] shadow-xs cursor-pointer"
               >
                 {t.profile.confirmWarningBtn}
               </button>

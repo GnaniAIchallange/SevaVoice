@@ -374,9 +374,9 @@ export default function Admin({ user }) {
             marginBottom: '18px',
             fontSize: '13.5px',
             fontWeight: 600,
-            background: actionMessage.type === 'error' ? '#fee2e2' : '#dcfce7',
-            color: actionMessage.type === 'error' ? '#dc2626' : '#15803d',
-            border: `1px solid ${actionMessage.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
+            background: actionMessage.type === 'error' ? 'var(--color-danger-bg)' : 'var(--color-success-bg)',
+            color: actionMessage.type === 'error' ? 'var(--color-danger)' : 'var(--color-success)',
+            border: `1px solid ${actionMessage.type === 'error' ? 'var(--color-danger)' : 'var(--color-success)'}`,
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -444,7 +444,7 @@ export default function Admin({ user }) {
             <div className="admin-kpi-card">
               <div className="admin-kpi-top">
                 <span className="admin-kpi-title">Total Users</span>
-                <span className="admin-kpi-icon" style={{ background: '#ecfdf5', color: '#047857' }}>
+                <span className="admin-kpi-icon" style={{ background: 'var(--color-success-bg)', color: 'var(--color-success)' }}>
                   <Users size={18} />
                 </span>
               </div>
@@ -459,26 +459,26 @@ export default function Admin({ user }) {
             <div className="admin-kpi-card">
               <div className="admin-kpi-top">
                 <span className="admin-kpi-title">Verified Farmers</span>
-                <span className="admin-kpi-icon" style={{ background: '#f0fdf4', color: '#166534' }}>
+                <span className="admin-kpi-icon" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
                   <CheckCircle2 size={18} />
                 </span>
               </div>
               <div className="admin-kpi-value">{loadingStats ? '—' : stats?.farmers?.verified || 0}</div>
               <div className="admin-kpi-subtext">
-                <span style={{ color: '#d97706' }}>{stats?.farmers?.pending || 0} verification pending</span>
+                <span style={{ color: 'var(--color-warning)' }}>{stats?.farmers?.pending || 0} verification pending</span>
               </div>
             </div>
 
             <div className="admin-kpi-card">
               <div className="admin-kpi-top">
                 <span className="admin-kpi-title">Total Assistance Requests</span>
-                <span className="admin-kpi-icon" style={{ background: '#eff6ff', color: '#2563eb' }}>
+                <span className="admin-kpi-icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
                   <Layers size={18} />
                 </span>
               </div>
               <div className="admin-kpi-value">{loadingStats ? '—' : stats?.requests?.total || 0}</div>
               <div className="admin-kpi-subtext">
-                <span style={{ color: '#15803d' }}>{stats?.requests?.approved || 0} Approved</span> •
+                <span style={{ color: 'var(--color-success)' }}>{stats?.requests?.approved || 0} Approved</span> •
                 <span>{stats?.requests?.funded || 0} Funded</span>
               </div>
             </div>
@@ -486,11 +486,11 @@ export default function Admin({ user }) {
             <div className="admin-kpi-card">
               <div className="admin-kpi-top">
                 <span className="admin-kpi-title">Funds Raised</span>
-                <span className="admin-kpi-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
+                <span className="admin-kpi-icon" style={{ background: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}>
                   <IndianRupee size={18} />
                 </span>
               </div>
-              <div className="admin-kpi-value" style={{ color: '#15803d' }}>
+              <div className="admin-kpi-value" style={{ color: 'var(--color-success)' }}>
                 ₹{loadingStats ? '—' : Number(stats?.financials?.totalFundsRaised || 0).toLocaleString()}
               </div>
               <div className="admin-kpi-subtext">
@@ -510,8 +510,8 @@ export default function Admin({ user }) {
                     <span>Farmers</span>
                     <strong>{stats?.users?.farmers || 0}</strong>
                   </div>
-                  <div style={{ background: '#e2e8f0', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ background: '#047857', height: '100%', width: `${stats?.users?.total ? ((stats.users.farmers / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
+                  <div style={{ background: 'var(--color-border)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--color-primary)', height: '100%', width: `${stats?.users?.total ? ((stats.users.farmers / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
                   </div>
                 </div>
 
@@ -520,8 +520,8 @@ export default function Admin({ user }) {
                     <span>Donors</span>
                     <strong>{stats?.users?.donors || 0}</strong>
                   </div>
-                  <div style={{ background: '#e2e8f0', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ background: '#2563eb', height: '100%', width: `${stats?.users?.total ? ((stats.users.donors / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
+                  <div style={{ background: 'var(--color-border)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ background: '#3b82f6', height: '100%', width: `${stats?.users?.total ? ((stats.users.donors / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
                   </div>
                 </div>
 
@@ -530,8 +530,8 @@ export default function Admin({ user }) {
                     <span>Field Verifiers</span>
                     <strong>{stats?.users?.verifiers || 0}</strong>
                   </div>
-                  <div style={{ background: '#e2e8f0', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ background: '#a21caf', height: '100%', width: `${stats?.users?.total ? ((stats.users.verifiers / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
+                  <div style={{ background: 'var(--color-border)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ background: '#8b5cf6', height: '100%', width: `${stats?.users?.total ? ((stats.users.verifiers / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
                   </div>
                 </div>
 
@@ -540,8 +540,8 @@ export default function Admin({ user }) {
                     <span>System Administrators</span>
                     <strong>{stats?.users?.admins || 0}</strong>
                   </div>
-                  <div style={{ background: '#e2e8f0', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ background: '#b91c1c', height: '100%', width: `${stats?.users?.total ? ((stats.users.admins / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
+                  <div style={{ background: 'var(--color-border)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ background: 'var(--color-danger)', height: '100%', width: `${stats?.users?.total ? ((stats.users.admins / stats.users.total) * 100).toFixed(0) : 0}%` }}></div>
                   </div>
                 </div>
               </div>
@@ -551,27 +551,27 @@ export default function Admin({ user }) {
             <div className="admin-section">
               <h3 className="admin-section-title" style={{ marginBottom: '14px' }}>Request Pipeline Health</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ background: '#eff6ff', padding: '14px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '12px', color: '#1e40af', fontWeight: 600 }}>SUBMITTED / PENDING</span>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#1e3a8a', marginTop: '4px' }}>
+                <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', padding: '14px', borderRadius: '8px' }}>
+                  <span style={{ fontSize: '12px', color: '#3b82f6', fontWeight: 600 }}>SUBMITTED / PENDING</span>
+                  <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text)', marginTop: '4px' }}>
                     {stats?.requests?.submitted || 0}
                   </div>
                 </div>
-                <div style={{ background: '#fef3c7', padding: '14px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '12px', color: '#92400e', fontWeight: 600 }}>UNDER VERIFIER REVIEW</span>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#78350f', marginTop: '4px' }}>
+                <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', padding: '14px', borderRadius: '8px' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--color-warning)', fontWeight: 600 }}>UNDER VERIFIER REVIEW</span>
+                  <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text)', marginTop: '4px' }}>
                     {stats?.requests?.underReview || 0}
                   </div>
                 </div>
-                <div style={{ background: '#f0fdf4', padding: '14px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '12px', color: '#166534', fontWeight: 600 }}>APPROVED & PUBLISHED</span>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#14532d', marginTop: '4px' }}>
+                <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', padding: '14px', borderRadius: '8px' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--color-primary)', fontWeight: 600 }}>APPROVED & PUBLISHED</span>
+                  <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text)', marginTop: '4px' }}>
                     {stats?.requests?.approved || 0}
                   </div>
                 </div>
-                <div style={{ background: '#ecfdf5', padding: '14px', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '12px', color: '#065f46', fontWeight: 700 }}>100% FULLY FUNDED</span>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#047857', marginTop: '4px' }}>
+                <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', padding: '14px', borderRadius: '8px' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--color-success)', fontWeight: 700 }}>100% FULLY FUNDED</span>
+                  <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-text)', marginTop: '4px' }}>
                     {stats?.requests?.funded || 0}
                   </div>
                 </div>
@@ -586,7 +586,7 @@ export default function Admin({ user }) {
         <div className="admin-section">
           <div className="admin-section-header">
             <h3 className="admin-section-title">User Accounts Directory</h3>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>
+            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
               Showing {users.length} of {userPagination.total} users
             </span>
           </div>
@@ -656,13 +656,13 @@ export default function Admin({ user }) {
               <tbody>
                 {loadingUsers ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       Loading user accounts...
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       No user accounts found matching your filters.
                     </td>
                   </tr>
@@ -671,7 +671,7 @@ export default function Admin({ user }) {
                     <tr key={u.id}>
                       <td>
                         <strong>{u.name}</strong>
-                        <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--color-text-dim)' }}>
                           Joined: {new Date(u.createdAt).toLocaleDateString()}
                         </div>
                       </td>
@@ -680,12 +680,12 @@ export default function Admin({ user }) {
                       </td>
                       <td>
                         <div>{u.phone}</div>
-                        <div style={{ fontSize: '12px', color: '#64748b' }}>{u.email}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{u.email}</div>
                       </td>
                       <td>
                         <div>{u.location}</div>
                         {u.cropType !== '—' && (
-                          <div style={{ fontSize: '11.5px', color: '#166534' }}>
+                          <div style={{ fontSize: '11.5px', color: 'var(--color-success)' }}>
                             {u.cropType} • {u.landSizeAcres} acres
                           </div>
                         )}
@@ -753,7 +753,7 @@ export default function Admin({ user }) {
                 <div className="admin-card-header">
                   <div>
                     <strong>{u.name}</strong>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>{u.phone}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{u.phone}</div>
                   </div>
                   <span className={`badge badge-${u.role}`}>{u.role.toUpperCase()}</span>
                 </div>
@@ -835,7 +835,7 @@ export default function Admin({ user }) {
         <div className="admin-section">
           <div className="admin-section-header">
             <h3 className="admin-section-title">Assistance Requests Oversight</h3>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>
+            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
               Showing {requests.length} of {reqPagination.total} requests
             </span>
           </div>
@@ -889,13 +889,13 @@ export default function Admin({ user }) {
               <tbody>
                 {loadingRequests ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       Loading assistance requests...
                     </td>
                   </tr>
                 ) : requests.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       No assistance requests found matching filters.
                     </td>
                   </tr>
@@ -909,13 +909,13 @@ export default function Admin({ user }) {
                       <tr key={r.id}>
                         <td>
                           <strong>{r.title}</strong>
-                          <div style={{ fontSize: '11px', color: '#64748b' }}>
+                          <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
                             Created: {new Date(r.createdAt).toLocaleDateString()}
                           </div>
                         </td>
                         <td>
                           <div>{r.farmer?.name || 'Farmer'}</div>
-                          <div style={{ fontSize: '11.5px', color: '#64748b' }}>{r.farmer?.location}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--color-text-muted)' }}>{r.farmer?.location}</div>
                         </td>
                         <td>
                           <span style={{ textTransform: 'capitalize' }}>{r.category}</span>
@@ -928,18 +928,18 @@ export default function Admin({ user }) {
                           <div className="funding-bar-bg">
                             <div className="funding-bar-fill" style={{ width: `${percent}%` }}></div>
                           </div>
-                          <span style={{ fontSize: '11px', color: '#166534' }}>{percent}% funded</span>
+                          <span style={{ fontSize: '11px', color: 'var(--color-success)' }}>{percent}% funded</span>
                         </td>
                         <td>
                           <span className={`badge badge-${r.status}`}>{r.status.toUpperCase()}</span>
                         </td>
                         <td>
                           {r.reviewedBy ? (
-                            <span style={{ fontSize: '12px', color: '#475569' }}>
+                            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                               {r.reviewedBy.name} ({r.reviewedBy.role})
                             </span>
                           ) : (
-                            <span style={{ color: '#94a3b8', fontSize: '12px' }}>Unassigned</span>
+                            <span style={{ color: 'var(--color-text-dim)', fontSize: '12px' }}>Unassigned</span>
                           )}
                         </td>
                         <td>
@@ -1043,7 +1043,7 @@ export default function Admin({ user }) {
           <div className="admin-section-header">
             <div>
               <h3 className="admin-section-title">Razorpay Transaction Ledger</h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--color-text-muted)' }}>
                 Audited record of all direct donor contributions and payment gateway settlements
               </p>
             </div>
@@ -1080,13 +1080,13 @@ export default function Admin({ user }) {
               <tbody>
                 {loadingDonations ? (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       Loading donation ledger...
                     </td>
                   </tr>
                 ) : donations.length === 0 ? (
                   <tr>
-                    <td colSpan="6" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       No donation transactions found for this filter.
                     </td>
                   </tr>
@@ -1095,11 +1095,11 @@ export default function Admin({ user }) {
                     <tr key={d.id}>
                       <td>{new Date(d.createdAt).toLocaleString()}</td>
                       <td>
-                        <code style={{ fontSize: '12px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                        <code style={{ fontSize: '12px', background: 'var(--color-surface-muted)', color: 'var(--color-text)', padding: '2px 6px', borderRadius: '4px' }}>
                           {d.razorpayPaymentId}
                         </code>
                         {d.razorpayOrderId !== '—' && (
-                          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
+                          <div style={{ fontSize: '11px', color: 'var(--color-text-dim)', marginTop: '2px' }}>
                             Order: {d.razorpayOrderId}
                           </div>
                         )}
@@ -1107,16 +1107,16 @@ export default function Admin({ user }) {
                       <td>
                         <strong>{d.donor.name}</strong>
                         {d.donor.phone !== '—' && (
-                          <div style={{ fontSize: '11px', color: '#64748b' }}>{d.donor.phone}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{d.donor.phone}</div>
                         )}
                       </td>
                       <td>
                         <strong>{d.request?.title || 'Assistance Request'}</strong>
-                        <div style={{ fontSize: '11.5px', color: '#166534' }}>
+                        <div style={{ fontSize: '11.5px', color: 'var(--color-success)' }}>
                           {d.request?.farmerName} ({d.request?.farmerLocation})
                         </div>
                       </td>
-                      <td style={{ fontWeight: 700, color: '#153f32', fontSize: '15px' }}>
+                      <td style={{ fontWeight: 700, color: 'var(--color-text)', fontSize: '15px' }}>
                         ₹{Number(d.amount).toLocaleString()}
                       </td>
                       <td>
@@ -1145,10 +1145,10 @@ export default function Admin({ user }) {
               <div className="admin-card-item" key={d.id}>
                 <div className="admin-card-header">
                   <div>
-                    <strong style={{ color: '#153f32', fontSize: '16px' }}>
+                    <strong style={{ color: 'var(--color-text)', fontSize: '16px' }}>
                       ₹{Number(d.amount).toLocaleString()}
                     </strong>
-                    <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                    <div style={{ fontSize: '11.5px', color: 'var(--color-text-muted)' }}>
                       {new Date(d.createdAt).toLocaleDateString()}
                     </div>
                   </div>
@@ -1216,7 +1216,7 @@ export default function Admin({ user }) {
         <div className="admin-section">
           <div className="admin-section-header">
             <h3 className="admin-section-title">System Audit Log Trail</h3>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>
+            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
               Showing {auditLogs.length} of {auditPagination.total} logged system events
             </span>
           </div>
@@ -1235,13 +1235,13 @@ export default function Admin({ user }) {
               <tbody>
                 {loadingAudit ? (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       Loading audit logs...
                     </td>
                   </tr>
                 ) : auditLogs.length === 0 ? (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: '28px', color: '#64748b' }}>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '28px', color: 'var(--color-text-muted)' }}>
                       No audit events recorded yet.
                     </td>
                   </tr>
@@ -1252,16 +1252,16 @@ export default function Admin({ user }) {
                       <td>
                         <strong>{log.actor?.name || 'System / Automated'}</strong>
                         {log.actor?.role && (
-                          <div style={{ fontSize: '11px', color: '#64748b' }}>{log.actor.role}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>{log.actor.role}</div>
                         )}
                       </td>
                       <td>
-                        <code style={{ fontSize: '12px', background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', color: '#153f32', fontWeight: 600 }}>
+                        <code style={{ fontSize: '12px', background: 'var(--color-surface-muted)', padding: '2px 6px', borderRadius: '4px', color: 'var(--color-text)', fontWeight: 600 }}>
                           {log.action}
                         </code>
                       </td>
                       <td>{log.targetType}</td>
-                      <td style={{ fontSize: '13px', color: '#475569' }}>{log.note}</td>
+                      <td style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>{log.note}</td>
                     </tr>
                   ))
                 )}
@@ -1275,7 +1275,7 @@ export default function Admin({ user }) {
               <div className="admin-card-item" key={log.id}>
                 <div className="admin-card-header">
                   <strong>{log.action}</strong>
-                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--color-text-dim)' }}>
                     {new Date(log.createdAt).toLocaleDateString()}
                   </span>
                 </div>
@@ -1338,17 +1338,17 @@ export default function Admin({ user }) {
             </div>
             <div className="modal-body">
               {loadingUserModal ? (
-                <div style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                <div style={{ textAlign: 'center', padding: '30px', color: 'var(--color-text-muted)' }}>
                   Loading profile and documents...
                 </div>
               ) : userModalData?.user ? (
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <div>
-                      <h3 style={{ margin: 0, fontSize: '20px', color: '#153f32' }}>
+                      <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--color-text)' }}>
                         {userModalData.user.name}
                       </h3>
-                      <span style={{ fontSize: '13px', color: '#64748b' }}>
+                      <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
                         Phone: {userModalData.user.phone} {userModalData.user.email ? `• ${userModalData.user.email}` : ''}
                       </span>
                     </div>
@@ -1357,7 +1357,7 @@ export default function Admin({ user }) {
                     </span>
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
+                  <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', padding: '14px', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
                     <div><strong>Location:</strong> {[userModalData.user.village, userModalData.user.district, userModalData.user.state].filter(Boolean).join(', ') || 'Not specified'}</div>
                     {userModalData.user.cropType && (
                       <div style={{ marginTop: '4px' }}>
@@ -1370,13 +1370,13 @@ export default function Admin({ user }) {
                   </div>
 
                   {/* Documents Section */}
-                  <h4 style={{ margin: '14px 0 8px 0', fontSize: '15px', color: '#153f32' }}>Uploaded Documents</h4>
+                  <h4 style={{ margin: '14px 0 8px 0', fontSize: '15px', color: 'var(--color-text)' }}>Uploaded Documents</h4>
                   {userModalData.documents?.length === 0 ? (
-                    <p style={{ fontSize: '13px', color: '#94a3b8' }}>No documents uploaded.</p>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-dim)' }}>No documents uploaded.</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
                       {userModalData.documents.map((doc) => (
-                        <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#f1f5f9', borderRadius: '6px', fontSize: '13px' }}>
+                        <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--color-surface-muted)', color: 'var(--color-text)', borderRadius: '6px', fontSize: '13px' }}>
                           <span><strong>{doc.documentType.toUpperCase()}:</strong> {doc.originalName || 'Document'}</span>
                           <span className={`badge ${doc.status === 'verified' ? 'badge-approved' : 'badge-under_review'}`}>
                             {doc.status}
@@ -1389,10 +1389,10 @@ export default function Admin({ user }) {
                   {/* Requests Section if Farmer */}
                   {userModalData.requests?.length > 0 && (
                     <>
-                      <h4 style={{ margin: '14px 0 8px 0', fontSize: '15px', color: '#153f32' }}>Assistance Requests ({userModalData.requests.length})</h4>
+                      <h4 style={{ margin: '14px 0 8px 0', fontSize: '15px', color: 'var(--color-text)' }}>Assistance Requests ({userModalData.requests.length})</h4>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {userModalData.requests.map((r) => (
-                          <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', fontSize: '13px' }}>
+                          <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', borderRadius: '6px', fontSize: '13px' }}>
                             <span>{r.title}</span>
                             <strong>₹{Number(r.amountRequested).toLocaleString()} ({r.status})</strong>
                           </div>
@@ -1423,13 +1423,13 @@ export default function Admin({ user }) {
               </button>
             </div>
             <div className="modal-body">
-              <p style={{ margin: '0 0 14px 0', fontSize: '14px', color: '#475569' }}>
+              <p style={{ margin: '0 0 14px 0', fontSize: '14px', color: 'var(--color-text-muted)' }}>
                 Select a new system role for <strong>{roleChangeUser.name}</strong> ({roleChangeUser.phone}):
               </p>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '14px' }}
               >
                 <option value="farmer">Farmer (Agri Workspace)</option>
                 <option value="donor">Donor (Supporter)</option>
@@ -1460,7 +1460,7 @@ export default function Admin({ user }) {
               </button>
             </div>
             <div className="modal-body">
-              <p style={{ margin: 0, fontSize: '14px', color: '#475569' }}>
+              <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-text-muted)' }}>
                 Are you sure you want to {statusConfirmUser.isActive ? 'DEACTIVATE' : 'ACTIVATE'} the account for{' '}
                 <strong>{statusConfirmUser.name}</strong>?
               </p>
@@ -1493,15 +1493,15 @@ export default function Admin({ user }) {
             </div>
             <div className="modal-body">
               <div style={{ marginBottom: '14px' }}>
-                <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#153f32' }}>
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: 'var(--color-text)' }}>
                   {viewingRequest.title}
                 </h4>
-                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted)' }}>
                   Farmer: <strong>{viewingRequest.farmer?.name}</strong> | Goal: ₹{Number(viewingRequest.amountRequested).toLocaleString()}
                 </p>
               </div>
 
-              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
+              <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', padding: '12px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
                 <div><strong>Purpose / Need:</strong> {viewingRequest.purpose || viewingRequest.reason || '—'}</div>
                 {viewingRequest.intendedUse && (
                   <div style={{ marginTop: '4px' }}><strong>Intended Use:</strong> {viewingRequest.intendedUse}</div>
@@ -1509,13 +1509,13 @@ export default function Admin({ user }) {
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '6px' }}>
                   Override Status To:
                 </label>
                 <select
                   value={overrideStatus}
                   onChange={(e) => setOverrideStatus(e.target.value)}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13.5px' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13.5px' }}
                 >
                   <option value="submitted">Submitted</option>
                   <option value="under_review">Under Review</option>
@@ -1527,7 +1527,7 @@ export default function Admin({ user }) {
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '6px' }}>
                   Admin Review Notes (Optional):
                 </label>
                 <textarea
@@ -1535,13 +1535,13 @@ export default function Admin({ user }) {
                   onChange={(e) => setOverrideNotes(e.target.value)}
                   placeholder="Reason for administrative override or instructions for the farmer..."
                   rows="3"
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px', boxSizing: 'border-box' }}
                 />
               </div>
 
               {overrideStatus === 'rejected' && (
                 <div style={{ marginBottom: '14px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#dc2626', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-danger)', marginBottom: '6px' }}>
                     Rejection Reason (Visible to Farmer):
                   </label>
                   <input
@@ -1549,7 +1549,7 @@ export default function Admin({ user }) {
                     value={overrideReason}
                     onChange={(e) => setOverrideReason(e.target.value)}
                     placeholder="Explain why this request is being rejected..."
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #fca5a5', fontSize: '13px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-danger)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px', boxSizing: 'border-box' }}
                   />
                 </div>
               )}

@@ -6,12 +6,39 @@ import { env } from "../config/env.js";
 import { createVoiceService, VoiceUnavailableError } from "../services/voiceService.js";
 
 const SUPPORTED_LANGUAGES = ["mr-IN", "hi-IN", "en-IN"];
+const LANGUAGE_ALIASES = {
+  mr: "mr-IN",
+  hi: "hi-IN",
+  en: "en-IN",
+  "mr-IN": "mr-IN",
+  "hi-IN": "hi-IN",
+  "en-IN": "en-IN",
+};
+
+function normalizeLanguage(lang) {
+  if (typeof lang !== "string") return lang;
+  return LANGUAGE_ALIASES[lang.trim()] || lang.trim();
+}
+
 const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
 
-const sttLanguageSchema = z.enum(SUPPORTED_LANGUAGES);
+const sttLanguageSchema = z
+  .string()
+  .transform(normalizeLanguage)
+  .refine((val) => SUPPORTED_LANGUAGES.includes(val), {
+    message: "Unsupported language_code",
+  });
+
+const ttsLanguageSchema = z
+  .string()
+  .transform(normalizeLanguage)
+  .refine((val) => SUPPORTED_LANGUAGES.includes(val), {
+    message: "Unsupported language",
+  });
+
 const ttsSchema = z.object({
   text: z.string().trim().min(1).max(300),
-  language: z.enum(SUPPORTED_LANGUAGES),
+  language: ttsLanguageSchema,
 });
 
 const uploadAudio = multer({

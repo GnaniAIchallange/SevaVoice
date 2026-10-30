@@ -1,107 +1,210 @@
+/* Unified Responsive Layout & Shell Styles using Semantic Design Tokens */
+
 .app-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 .topbar {
   align-items: center;
-  border-bottom: 1px solid #dfe5df;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
   display: flex;
   height: 68px;
   justify-content: space-between;
-  padding: 0 clamp(20px, 5vw, 72px);
+  padding: 0 clamp(16px, 4vw, 48px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
-.topbar nav {
-  align-items: center;
+.brand-wrapper {
   display: flex;
-  gap: 22px;
+  align-items: center;
+  gap: 10px;
 }
 
 .brand {
-  color: #153f32;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 22px;
   font-weight: 700;
   text-decoration: none;
+  min-height: 44px;
+}
+
+.brand:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.topbar nav.desktop-nav {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.nav-link {
+  color: var(--color-text-muted);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: color 150ms ease, background-color 150ms ease;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+  background-color: var(--color-surface-muted);
+}
+
+.nav-register {
+  background-color: var(--color-primary);
+  border-radius: 10px;
+  color: var(--color-primary-foreground);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 18px;
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease, transform 100ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.nav-register:hover {
+  background-color: var(--color-primary-hover);
 }
 
 .login-link,
 .back-link {
   background: none;
   border: 0;
-  color: #153f32;
+  color: var(--color-text-muted);
   cursor: pointer;
   font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
   text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
-.login-link {
-  font-size: 15px;
-  font-weight: 650;
-  padding: 10px 0;
+.login-link:hover,
+.back-link:hover {
+  color: var(--color-primary);
+  background-color: var(--color-surface-muted);
 }
 
-.nav-link {
-  color: #385449;
-  font-size: 14px;
-  text-decoration: none;
+/* Mobile Nav Drawer / Overlay */
+.mobile-nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
 }
 
-.nav-link:hover,
-.home-secondary:hover,
-.workspace-card:hover .workspace-card-link {
-  color: #1d684b;
+.mobile-nav-menu {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px 20px;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: absolute;
+  top: 68px;
+  left: 0;
+  right: 0;
+  z-index: 39;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: slideDown 150ms ease-out;
 }
 
-.nav-register {
-  background: #1d684b;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 650;
-  padding: 10px 16px;
-  text-decoration: none;
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.nav-register:hover {
-  background: #15563c;
+.mobile-nav-menu .nav-link,
+.mobile-nav-menu .login-link,
+.mobile-nav-menu .nav-register {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 12px 14px;
 }
 
+.mobile-nav-menu .nav-register {
+  justify-content: center;
+}
+
+/* Landing / Home Page */
 .home-page {
   margin: 0 auto;
-  max-width: 980px;
-  padding: clamp(56px, 9vw, 104px) 24px 72px;
+  max-width: 1040px;
+  padding: clamp(36px, 7vw, 84px) clamp(16px, 4vw, 32px) 72px;
+  width: 100%;
 }
 
 .home-page > .eyebrow {
-  color: #1d684b;
+  color: var(--color-primary);
 }
 
 .home-page h1 {
-  color: #183c31;
+  color: var(--color-text);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(38px, 6vw, 58px);
-  font-weight: 500;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
+  font-size: clamp(32px, 5.5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   margin: 0;
-  max-width: 680px;
+  max-width: 720px;
 }
 
 .home-copy {
-  color: #64776d;
-  font-size: 17px;
+  color: var(--color-text-muted);
+  font-size: clamp(16px, 2vw, 19px);
   line-height: 1.65;
   margin: 20px 0 0;
-  max-width: 620px;
+  max-width: 640px;
 }
 
 .home-actions {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 24px;
-  margin-top: 28px;
+  gap: 14px 20px;
+  margin-top: 32px;
 }
 
 .home-primary {
@@ -112,99 +215,114 @@
 }
 
 .home-secondary {
-  color: #1d684b;
-  font-size: 14px;
-  font-weight: 650;
-  text-underline-offset: 3px;
+  color: var(--color-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-underline-offset: 4px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.home-secondary:hover {
+  background-color: var(--color-surface-muted);
 }
 
 .workspace-list {
-  border-top: 1px solid #dfe5df;
-  margin-top: 76px;
-  padding-top: 28px;
+  border-top: 1px solid var(--color-border);
+  margin-top: clamp(48px, 8vw, 76px);
+  padding-top: 32px;
 }
 
 .workspace-list h2 {
-  color: #183c31;
+  color: var(--color-text);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 23px;
-  font-weight: 500;
-  margin: 0 0 18px;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 20px;
 }
 
 .workspace-grid {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .workspace-card {
-  background: #fff;
-  border: 1px solid #dfe5df;
-  border-radius: 6px;
-  color: #183c31;
-  min-height: 150px;
-  padding: 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  color: var(--color-text);
+  min-height: 160px;
+  padding: 22px;
   text-decoration: none;
-  transition: border-color 120ms ease, transform 120ms ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .workspace-card:hover {
-  border-color: #a7b9ad;
+  border-color: var(--color-primary);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .workspace-card > span:first-child {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
+  color: var(--color-text);
 }
 
 .workspace-card p {
-  color: #64776d;
-  font-size: 13px;
+  color: var(--color-text-muted);
+  font-size: 14px;
   line-height: 1.5;
-  margin: 10px 0 18px;
+  margin: 8px 0 16px;
+  flex-grow: 1;
 }
 
 .workspace-card-link {
-  color: #385449;
-  font-size: 12px;
-  font-weight: 650;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
+/* Public Login / Auth Panels */
 .login-panel {
-  margin: 48px auto;
-  max-width: 400px;
-  padding: 0 24px;
+  margin: clamp(24px, 5vw, 48px) auto;
+  max-width: 440px;
+  padding: 0 20px;
+  width: 100%;
 }
 
 .role-page {
-  margin: 64px auto;
-  max-width: 720px;
+  margin: 48px auto;
+  max-width: 760px;
   padding: 0 24px;
 }
 
 .role-page h1 {
-  color: #183c31;
+  color: var(--color-text);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 32px;
-  font-weight: 500;
+  font-weight: 700;
   margin: 0 0 12px;
 }
 
 .role-page-copy {
-  color: #64776d;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
-.back-link {
-  display: inline-block;
-  margin: 0 0 36px -8px;
-  padding: 8px;
-}
-
 .eyebrow {
-  color: #64776d;
+  color: var(--color-primary);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -213,135 +331,136 @@
 }
 
 .login-panel h1 {
-  color: #183c31;
+  color: var(--color-text);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 32px;
-  font-weight: 500;
-  margin: 0 0 28px;
+  font-size: clamp(26px, 5vw, 34px);
+  font-weight: 700;
+  margin: 0 0 24px;
 }
 
 .login-form {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .login-form label {
-  color: #283c34;
+  color: var(--color-text);
   font-size: 14px;
   font-weight: 600;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-.login-form input {
-  background: #fff;
-  border: 1px solid #bac8bf;
-  border-radius: 4px;
-  color: #1e2c25;
-  font: inherit;
-  min-height: 46px;
-  padding: 0 12px;
-  width: 100%;
-}
-
+.login-form input,
 .login-form select {
-  background: #fff;
-  border: 1px solid #bac8bf;
-  border-radius: 4px;
-  color: #1e2c25;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text);
   font: inherit;
-  min-height: 46px;
-  padding: 0 12px;
+  font-size: 16px;
+  min-height: 48px;
+  padding: 0 14px;
   width: 100%;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.login-form input:focus {
-  border-color: #237556;
-  outline: 2px solid #237556;
+.login-form input:focus,
+.login-form select:focus {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-ring);
   outline-offset: 1px;
 }
 
 .login-form input::placeholder {
-  color: #87958d;
+  color: var(--color-text-muted);
+  opacity: 0.6;
 }
 
 .submit-button {
-  background: #1d684b;
-  border: 1px solid #1d684b;
-  border-radius: 4px;
-  color: #fff;
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: 12px;
+  color: var(--color-primary-foreground);
   cursor: pointer;
   font: inherit;
-  font-weight: 650;
+  font-weight: 700;
+  font-size: 15px;
   margin-top: 18px;
-  min-height: 46px;
-  padding: 0 18px;
+  min-height: 48px;
+  padding: 0 20px;
+  transition: background-color 150ms ease, opacity 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #15563c;
+  background: var(--color-primary-hover);
 }
 
 .submit-button:disabled {
   cursor: wait;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .form-error {
-  color: #a32f29;
+  color: var(--color-danger);
   font-size: 14px;
+  font-weight: 600;
   margin: 4px 0 0;
 }
 
 .auth-switch {
   background: none;
   border: 0;
-  color: #1d684b;
+  color: var(--color-primary);
   cursor: pointer;
   display: block;
   font: inherit;
-  font-size: 14px;
-  margin: 18px auto 0;
-  padding: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  margin: 20px auto 0;
+  padding: 10px;
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
+  min-height: 44px;
 }
 
 .account-role {
-  color: #64776d;
+  color: var(--color-text-muted);
   margin: -16px 0 12px;
   text-transform: capitalize;
 }
 
-@media (max-width: 480px) {
-  .topbar {
-    height: 60px;
-    padding: 0 20px;
-  }
-
-  .topbar nav {
-    gap: 14px;
-  }
-
-  .nav-link,
-  .nav-register {
-    font-size: 13px;
-  }
-
-  .nav-register {
-    padding: 9px 12px;
-  }
-
+/* Responsive Media Queries */
+@media (max-width: 900px) {
   .workspace-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .login-panel {
-    margin-top: 32px;
-  }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 640px) {
+  .topbar {
+    height: 62px;
+    padding: 0 16px;
+  }
+
+  .topbar nav.desktop-nav {
+    display: none;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+
+  .mobile-nav-menu.open {
+    display: flex;
+  }
+
   .workspace-grid {
     grid-template-columns: 1fr;
+  }
+
+  .login-panel {
+    margin-top: 24px;
+    padding: 0 16px;
   }
 }

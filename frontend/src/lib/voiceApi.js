@@ -1,6 +1,54 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const SAMPLE_RATE = 16000;
 
+export function normalizeVoiceLanguage(language) {
+  if (!language) return "en-IN";
+  const trimmed = String(language).trim();
+  const map = {
+    mr: "mr-IN",
+    hi: "hi-IN",
+    en: "en-IN",
+    "mr-IN": "mr-IN",
+    "hi-IN": "hi-IN",
+    "en-IN": "en-IN",
+  };
+  return map[trimmed] || (trimmed.length === 2 ? `${trimmed}-IN` : trimmed);
+}
+
+function speakWithBrowserSynthesis(text, language) {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) {
+      return reject(new Error("Speech synthesis not supported"));
+    }
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language;
+
+      const voices = window.speechSynthesis.getVoices();
+      const match = voices.find(
+        (v) => v.lang === language || v.lang.startsWith(language.slice(0, 2)),
+      );
+      if (match) {
+        utterance.voice = match;
+      }
+
+      utterance.onend = () => resolve();
+      utterance.onerror = (e) => {
+        if (e.error === "canceled" || e.error === "interrupted") {
+          resolve();
+        } else {
+          reject(e);
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 function createSilentWavUrl() {
   const data = new ArrayBuffer(46);
   const view = new DataView(data);
@@ -39,9 +87,10 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
   let disposed = false;
 
   async function transcribe(audio, language) {
+    const normLang = normalizeVoiceLanguage(language);
     const body = new FormData();
     body.append("audio_file", audio, "recording.wav");
-    body.append("language_code", language);
+    body.append("language_code", normLang);
 
     const controller = new AbortController();
     transcriptionController = controller;
@@ -81,6 +130,14 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
         new DOMException("Audio playback stopped", "AbortError"),
       );
       currentPlaybackCancel = null;
+    }
+
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Ignore synthesis cancel error
+      }
     }
 
     if (audioElement) {
@@ -126,9 +183,14 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
       throw new Error("Voice player has been disposed");
     }
 
+    const cleanText = (text || "").trim().slice(0, 300);
+    if (!cleanText) return;
+
+    const normLang = normalizeVoiceLanguage(language);
+
     cancelPlayback(audioElement);
     const operation = playbackGeneration;
-    if (!audioUnlocked) {
+    if (audioElement && !audioUnlocked) {
       silentAudioUrl = createSilentWavUrl();
       audioElement.src = silentAudioUrl;
       audioUnlocked = true;
@@ -139,7 +201,7 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
       }
     }
 
-    const key = JSON.stringify([language, text]);
+    const key = JSON.stringify([normLang, cleanText]);
     let audioUrl = audioUrls.get(key);
 
     if (!audioUrl) {
@@ -150,7 +212,7 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
         response = await fetchImpl(`${API_URL}/api/voice/tts`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, language }),
+          body: JSON.stringify({ text: cleanText, language: normLang }),
           signal: controller.signal,
         });
       } catch (error) {
@@ -161,7 +223,8 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
         ) {
           throw new DOMException("Audio playback stopped", "AbortError");
         }
-        throw error;
+        // Fallback to client browser synthesis if network/server is unreachable
+        return speakWithBrowserSynthesis(cleanText, normLang);
       }
 
       if (disposed || controller.signal.aborted || playbackGeneration !== operation) {
@@ -169,13 +232,8 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
       }
 
       if (!response.ok) {
-        let message = "Speech playback is unavailable";
-        try {
-          message = (await response.json()).error || message;
-        } catch {
-          // Keep the generic playback message for non-JSON errors.
-        }
-        throw new Error(message);
+        // Fallback to client browser synthesis if backend TTS errors
+        return speakWithBrowserSynthesis(cleanText, normLang);
       }
 
       const blob = await response.blob();
@@ -200,10 +258,20 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
       throw new DOMException("Audio playback stopped", "AbortError");
     }
 
-    audioElement.pause();
-    audioElement.src = audioUrl;
-    audioElement.currentTime = 0;
-    await waitForPlayback(audioElement);
+    if (audioElement) {
+      try {
+        audioElement.pause();
+        audioElement.src = audioUrl;
+        audioElement.currentTime = 0;
+        await waitForPlayback(audioElement);
+      } catch (err) {
+        if (err.name === "AbortError") throw err;
+        // If HTML5 audio playback fails (e.g. autoplay restriction), fallback to browser speech synthesis
+        await speakWithBrowserSynthesis(cleanText, normLang);
+      }
+    } else {
+      await speakWithBrowserSynthesis(cleanText, normLang);
+    }
   }
 
   function stop(audioElement) {

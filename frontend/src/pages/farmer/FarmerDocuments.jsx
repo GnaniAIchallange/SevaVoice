@@ -6,9 +6,7 @@ import {
   CheckCircle2,
   Clock,
   FileText,
-  Info,
   RefreshCw,
-  ShieldCheck,
   UploadCloud,
   X,
 } from "lucide-react";
@@ -20,19 +18,19 @@ function getDocBadge(status, t) {
     case "verified":
       return {
         label: t.documents.statuses.verified,
-        className: "bg-emerald-100 text-emerald-800 border-emerald-300",
+        className: "bg-success-soft text-success-soft-text border-success/30",
         icon: CheckCircle2,
       };
     case "rejected":
       return {
         label: t.documents.statuses.rejected,
-        className: "bg-rose-100 text-rose-800 border-rose-300 font-bold",
+        className: "bg-danger-soft text-danger-soft-text border-danger/30 font-bold",
         icon: AlertTriangle,
       };
     default:
       return {
         label: t.documents.statuses.pending,
-        className: "bg-amber-100 text-amber-800 border-amber-300",
+        className: "bg-warning-soft text-warning-soft-text border-warning/30",
         icon: Clock,
       };
   }
@@ -123,24 +121,24 @@ export default function FarmerDocuments({ user, onBack }) {
   }
 
   return (
-    <div className="space-y-6 pb-24 max-w-2xl mx-auto px-4 pt-2">
+    <div className="space-y-6 pb-24 max-w-2xl mx-auto px-4 pt-4">
       {/* Top Header */}
-      <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+      <div className="flex items-center gap-3 border-b border-border pb-4">
         {onBack && (
           <button
             onClick={onBack}
             type="button"
-            className="p-2 text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 rounded-full border border-slate-200 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
+            className="p-2.5 text-text-muted hover:text-primary bg-surface hover:bg-surface-muted rounded-2xl border border-border min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         )}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text font-serif">
             {t.documents.pageTitle}
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-text-muted mt-0.5">
             {t.documents.subtitle}
           </p>
         </div>
@@ -148,26 +146,26 @@ export default function FarmerDocuments({ user, onBack }) {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center p-8 text-center min-h-[250px]" role="status">
-          <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mb-3" />
-          <p className="text-base text-slate-600">{t.common.loading}</p>
+          <RefreshCw className="w-8 h-8 text-primary animate-spin mb-3" />
+          <p className="text-base text-text-muted">{t.common.loading}</p>
         </div>
       ) : error ? (
-        <div className="p-6 bg-rose-50 border border-rose-200 rounded-2xl text-center" role="alert">
-          <AlertCircle className="w-10 h-10 text-rose-600 mx-auto mb-2" />
-          <p className="text-base font-semibold text-rose-800 mb-4">{error}</p>
+        <div className="p-6 bg-danger-soft border border-danger/30 rounded-2xl text-center" role="alert">
+          <AlertCircle className="w-10 h-10 text-danger mx-auto mb-2" />
+          <p className="text-base font-semibold text-danger-soft-text mb-4">{error}</p>
           <button
             onClick={loadDocuments}
             type="button"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-rose-600 text-white rounded-xl font-medium min-h-[44px]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-danger text-danger-foreground rounded-xl font-medium min-h-[44px] cursor-pointer"
           >
             <RefreshCw className="w-5 h-5" />
             <span>{t.common.retry}</span>
           </button>
         </div>
       ) : documents.length === 0 ? (
-        <div className="p-8 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-          <FileText className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-          <p className="text-base font-bold text-slate-700">{t.documents.noDocs}</p>
+        <div className="p-8 sm:p-12 bg-surface border border-dashed border-border rounded-2xl text-center">
+          <FileText className="w-12 h-12 text-text-muted/60 mx-auto mb-3" />
+          <p className="text-base font-bold text-text">{t.documents.noDocs}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -187,20 +185,20 @@ export default function FarmerDocuments({ user, onBack }) {
             return (
               <div
                 key={doc.id}
-                className={`p-5 rounded-2xl border bg-white shadow-xs transition-all ${
-                  isRejected ? "border-rose-300 ring-1 ring-rose-200" : "border-slate-200"
+                className={`p-5 rounded-2xl border bg-surface shadow-xs transition-all ${
+                  isRejected ? "border-danger/40 ring-1 ring-danger/20" : "border-border"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <div className={`p-2.5 rounded-xl shrink-0 ${isRejected ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}>
+                    <div className={`p-2.5 rounded-xl shrink-0 ${isRejected ? "bg-danger-soft text-danger" : "bg-primary-soft text-primary"}`}>
                       <FileText className="w-6 h-6" />
                     </div>
                     <div>
-                      <h2 className="text-base font-bold text-slate-900">
+                      <h2 className="text-base font-bold text-text">
                         {docName}
                       </h2>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-xs text-text-muted mt-0.5">
                         {uploadDate ? `Uploaded: ${uploadDate}` : ""}
                         {doc.size ? ` • ${(doc.size / (1024 * 1024)).toFixed(1)} MB` : ""}
                       </p>
@@ -215,9 +213,9 @@ export default function FarmerDocuments({ user, onBack }) {
 
                 {/* Rejection notice and reason */}
                 {isRejected && (
-                  <div className="mt-4 p-3.5 bg-rose-50 border border-rose-200 rounded-xl">
-                    <div className="flex items-start gap-2 text-rose-900 text-xs">
-                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <div className="mt-4 p-4 bg-danger-soft border border-danger/30 rounded-xl">
+                    <div className="flex items-start gap-2 text-danger-soft-text text-xs">
+                      <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold">{t.documents.rejectionReasonPrefix} </span>
                         <span>{doc.rejectionReason || "Document could not be verified. Please upload a clear original copy."}</span>
@@ -232,7 +230,7 @@ export default function FarmerDocuments({ user, onBack }) {
                         setUploadSuccess(null);
                       }}
                       type="button"
-                      className="mt-3 w-full py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 min-h-[44px] shadow-xs transition-colors"
+                      className="mt-3 w-full py-2.5 px-4 bg-danger hover:opacity-90 text-danger-foreground font-bold text-xs rounded-xl flex items-center justify-center gap-2 min-h-[44px] shadow-xs transition-opacity cursor-pointer"
                     >
                       <UploadCloud className="w-4 h-4" />
                       <span>{t.documents.reuploadBtn}</span>
@@ -253,31 +251,31 @@ export default function FarmerDocuments({ user, onBack }) {
           aria-modal="true"
           aria-labelledby="modal-title"
         >
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-              <h2 id="modal-title" className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <UploadCloud className="w-5 h-5 text-emerald-600" />
+          <div className="bg-surface text-text rounded-3xl p-6 w-full max-w-md shadow-2xl border border-border max-h-[90dvh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+              <h2 id="modal-title" className="text-lg font-bold text-text flex items-center gap-2 font-serif">
+                <UploadCloud className="w-5 h-5 text-primary" />
                 <span>{t.documents.reuploadBtn}</span>
               </h2>
               <button
                 onClick={() => setSelectedDocForReupload(null)}
                 type="button"
-                className="p-2 text-slate-400 hover:text-slate-600 rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-2 text-text-muted hover:text-text rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-sm text-slate-700 mb-1">
-              Replacing: <span className="font-bold text-slate-900">{t.documents.docTypes[selectedDocForReupload.type] || selectedDocForReupload.type}</span>
+            <p className="text-sm text-text-muted mb-1">
+              Replacing: <strong className="text-text">{t.documents.docTypes[selectedDocForReupload.type] || selectedDocForReupload.type}</strong>
             </p>
-            <p className="text-xs text-slate-500 mb-4">
+            <p className="text-xs text-text-muted mb-4">
               {t.documents.uploadNewFilePrompt}
             </p>
 
             <form onSubmit={handleReuploadSubmit} className="space-y-4">
-              <div className="border-2 border-dashed border-slate-200 hover:border-emerald-500 rounded-2xl p-5 text-center bg-slate-50 transition-colors">
+              <div className="border-2 border-dashed border-border hover:border-primary rounded-2xl p-5 text-center bg-surface-muted transition-colors">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -290,26 +288,26 @@ export default function FarmerDocuments({ user, onBack }) {
                   htmlFor="reupload-file-input"
                   className="cursor-pointer flex flex-col items-center justify-center min-h-[64px]"
                 >
-                  <UploadCloud className="w-10 h-10 text-emerald-600 mb-2" />
-                  <span className="text-sm font-bold text-emerald-700">
+                  <UploadCloud className="w-10 h-10 text-primary mb-2" />
+                  <span className="text-sm font-bold text-primary">
                     {uploadFile ? uploadFile.name : t.documents.chooseFile}
                   </span>
-                  <span className="text-xs text-slate-500 mt-1">
+                  <span className="text-xs text-text-muted mt-1">
                     {uploadFile ? `${(uploadFile.size / (1024 * 1024)).toFixed(1)} MB` : "PDF, JPG, or PNG (Max 8 MB)"}
                   </span>
                 </label>
               </div>
 
               {uploadError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start gap-2" role="alert">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <div className="p-3 bg-danger-soft border border-danger/30 rounded-xl text-xs text-danger-soft-text flex items-start gap-2" role="alert">
+                  <AlertCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
                   <span>{uploadError}</span>
                 </div>
               )}
 
               {uploadSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start gap-2" role="alert">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <div className="p-3 bg-success-soft border border-success/30 rounded-xl text-xs text-success-soft-text flex items-start gap-2" role="alert">
+                  <CheckCircle2 className="w-4 h-4 text-success shrink-0 mt-0.5" />
                   <span>{uploadSuccess}</span>
                 </div>
               )}
@@ -319,14 +317,14 @@ export default function FarmerDocuments({ user, onBack }) {
                   type="button"
                   onClick={() => setSelectedDocForReupload(null)}
                   disabled={uploading}
-                  className="flex-1 py-3 px-4 border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl min-h-[44px]"
+                  className="flex-1 py-3 px-4 border border-border text-text-muted font-semibold text-sm rounded-xl min-h-[44px] hover:bg-surface-muted cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!uploadFile || uploading}
-                  className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm rounded-xl min-h-[44px] flex items-center justify-center gap-2 shadow-xs"
+                  className="flex-1 py-3 px-4 bg-primary hover:bg-primary-hover disabled:bg-surface-muted disabled:text-text-muted text-primary-foreground font-bold text-sm rounded-xl min-h-[44px] flex items-center justify-center gap-2 shadow-xs cursor-pointer transition-colors"
                 >
                   {uploading ? (
                     <>

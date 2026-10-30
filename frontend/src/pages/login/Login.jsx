@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowLeft, Lock, LogIn, Phone } from "lucide-react";
 import RouteLink from "../../components/RouteLink.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -37,13 +38,18 @@ function Login({ onNavigate, onAuthenticated }) {
 
   return (
     <section className="login-panel" aria-labelledby="login-title">
-      <RouteLink className="back-link" to="/" onNavigate={onNavigate}>
-        Back
+      <RouteLink className="back-link inline-flex items-center gap-1.5" to="/" onNavigate={onNavigate}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        <span>Back to home</span>
       </RouteLink>
       <p className="eyebrow">SevaVoice account</p>
       <h1 id="login-title">Login</h1>
+
       <form className="login-form" onSubmit={handleSubmit}>
-        <label htmlFor="phone">Phone number</label>
+        <label htmlFor="phone" className="flex items-center gap-1.5">
+          <Phone size={14} className="text-primary" aria-hidden="true" />
+          <span>Phone number</span>
+        </label>
         <input
           autoComplete="tel"
           id="phone"
@@ -55,7 +61,10 @@ function Login({ onNavigate, onAuthenticated }) {
           value={phone}
         />
 
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password" className="flex items-center gap-1.5">
+          <Lock size={14} className="text-primary" aria-hidden="true" />
+          <span>Password</span>
+        </label>
         <input
           autoComplete="current-password"
           id="password"
@@ -68,25 +77,27 @@ function Login({ onNavigate, onAuthenticated }) {
         />
 
         {error && (
-          <p className="form-error" role="alert">
+          <div className="p-3.5 rounded-xl bg-danger-soft border border-danger/30 text-danger-soft-text text-sm font-semibold mt-1" role="alert">
             {error}
-          </p>
+          </div>
         )}
 
         <button
-          className="submit-button"
+          className="submit-button inline-flex items-center justify-center gap-2"
           disabled={isSubmitting}
           type="submit"
         >
-          {isSubmitting ? "Signing in..." : "Login"}
+          <LogIn size={18} aria-hidden="true" />
+          <span>{isSubmitting ? "Signing in..." : "Login to account"}</span>
         </button>
       </form>
+
       <RouteLink
-        className="auth-switch"
+        className="auth-switch text-center"
         to="/register"
         onNavigate={onNavigate}
       >
-        Register
+        Don't have an account? Register here
       </RouteLink>
     </section>
   );

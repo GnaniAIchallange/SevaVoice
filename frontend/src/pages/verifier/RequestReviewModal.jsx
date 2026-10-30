@@ -99,10 +99,10 @@ export default function RequestReviewModal({ requestId, onClose, onUpdated, onVi
 
   if (loading) {
     return (
-      <div className="modal-overlay">
+      <div className="modal-overlay" role="dialog" aria-modal="true">
         <div className="modal-content">
           <div className="modal-body" style={{ textAlign: 'center', padding: '60px' }}>
-            <Clock size={32} style={{ margin: '0 auto 12px auto', color: '#1d684b' }} />
+            <Clock size={32} style={{ margin: '0 auto 12px auto', color: 'var(--color-primary)' }} />
             <p>Loading assistance request review...</p>
           </div>
         </div>
@@ -112,11 +112,11 @@ export default function RequestReviewModal({ requestId, onClose, onUpdated, onVi
 
   if (error || !data) {
     return (
-      <div className="modal-overlay">
+      <div className="modal-overlay" role="dialog" aria-modal="true">
         <div className="modal-content">
           <div className="modal-header">
             <h2>Error Loading Request</h2>
-            <button className="modal-close-btn" onClick={onClose}><X size={20} /></button>
+            <button className="modal-close-btn" onClick={onClose} aria-label="Close modal"><X size={20} /></button>
           </div>
           <div className="modal-body">
             <p className="form-error">{error || 'Record unavailable'}</p>
@@ -133,14 +133,14 @@ export default function RequestReviewModal({ requestId, onClose, onUpdated, onVi
   const isFarmerVerified = farmer?.farmerVerificationStatus === 'verified';
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" role="dialog" aria-modal="true">
       <div className="modal-content">
         <div className="modal-header">
           <div>
             <h2>Review Assistance Request: {request.title}</h2>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>Request ID: {request.id}</span>
+            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Request ID: {request.id}</span>
           </div>
-          <button className="modal-close-btn" onClick={onClose}><X size={20} /></button>
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal"><X size={20} /></button>
         </div>
 
         <div className="modal-body">
@@ -219,7 +219,7 @@ export default function RequestReviewModal({ requestId, onClose, onUpdated, onVi
               </div>
               <div className="info-item">
                 <span className="info-label">Requested Amount</span>
-                <span className="info-value" style={{ color: '#153f32', fontSize: '18px' }}>
+                <span className="info-value" style={{ color: 'var(--color-text)', fontSize: '18px' }}>
                   ₹{Number(request.amountRequested || 0).toLocaleString()}
                 </span>
               </div>
@@ -235,14 +235,14 @@ export default function RequestReviewModal({ requestId, onClose, onUpdated, onVi
 
             <div style={{ marginBottom: '12px' }}>
               <span className="info-label">Reason for Requesting Assistance</span>
-              <p style={{ margin: '4px 0 0 0', fontSize: '14px', lineHeight: '1.5', color: '#1e293b' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '14px', lineHeight: '1.5', color: 'var(--color-text)' }}>
                 {request.reason || request.purpose || 'No description provided.'}
               </p>
             </div>
 
             <div style={{ marginBottom: '12px' }}>
               <span className="info-label">Intended Use of Funds</span>
-              <p style={{ margin: '4px 0 0 0', fontSize: '14px', lineHeight: '1.5', color: '#1e293b' }}>
+              <p style={{ margin: '4px 0 0 0', fontSize: '14px', lineHeight: '1.5', color: 'var(--color-text)' }}>
                 {request.intendedUse || request.purpose || 'No details provided.'}
               </p>
             </div>
@@ -258,15 +258,15 @@ export default function RequestReviewModal({ requestId, onClose, onUpdated, onVi
           </div>
 
           {/* Decision Section */}
-          <div className="info-section" style={{ background: '#ffffff', border: '1px solid #cbd5e1' }}>
+          <div className="info-section" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
             <h3><ShieldCheck size={16} /> Verifier Decision</h3>
 
             <div style={{ marginBottom: '14px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '6px' }}>
                 Review Notes / Reason (Required for rejection or additional info):
               </label>
               <textarea
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', minHeight: '64px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px', minHeight: '64px', boxSizing: 'border-box' }}
                 placeholder="Enter remarks or justification for your decision..."
                 value={decisionReason}
                 onChange={(e) => setDecisionReason(e.target.value)}

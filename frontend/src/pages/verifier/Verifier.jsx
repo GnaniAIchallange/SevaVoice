@@ -340,7 +340,7 @@ export default function Verifier({ user }) {
                             {farmer.name}
                           </button>
                         </td>
-                        <td style={{ fontSize: '12px', color: '#64748b' }}>
+                        <td style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                           {String(farmer.id).slice(-8)}
                         </td>
                         <td style={{ fontWeight: 500 }}>
@@ -353,7 +353,7 @@ export default function Verifier({ user }) {
                           {farmer.cropType ? `${farmer.cropType}` : 'General'}
                           {farmer.landSizeAcres ? ` (${farmer.landSizeAcres} ac)` : ''}
                         </td>
-                        <td style={{ fontSize: '13px', color: '#475569' }}>
+                        <td style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
                           {farmer.verificationSubmittedAt ? new Date(farmer.verificationSubmittedAt).toLocaleDateString() : 'N/A'}
                         </td>
                         <td>
@@ -390,7 +390,7 @@ export default function Verifier({ user }) {
                           <User size={16} />
                           {farmer.name}
                         </button>
-                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                           ID: {String(farmer.id).slice(-8)} &bull; Phone: {farmer.phone}
                         </div>
                       </div>
@@ -440,7 +440,7 @@ export default function Verifier({ user }) {
               >
                 <ChevronLeft size={16} /> Previous
               </button>
-              <span style={{ fontSize: '13px', color: '#64748b' }}>
+              <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
                 Page {farmerPage} of {farmerPagination.totalPages}
               </span>
               <button
@@ -532,8 +532,8 @@ export default function Verifier({ user }) {
                     {requests.map((item) => (
                       <tr key={item.id}>
                         <td style={{ maxWidth: '240px' }}>
-                          <strong style={{ display: 'block', color: '#153f32' }}>{item.title}</strong>
-                          <span style={{ fontSize: '12px', color: '#64748b' }}>
+                          <strong style={{ display: 'block', color: 'var(--color-text)' }}>{item.title}</strong>
+                          <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                             {item.reason ? (item.reason.slice(0, 50) + (item.reason.length > 50 ? '...' : '')) : ''}
                           </span>
                         </td>
@@ -546,17 +546,17 @@ export default function Verifier({ user }) {
                             <User size={14} />
                             {item.farmer.name}
                           </button>
-                          <div style={{ fontSize: '12px', color: '#64748b' }}>
+                          <div style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
                             {[item.farmer.village, item.farmer.district].filter(Boolean).join(', ')}
                           </div>
                         </td>
                         <td style={{ textTransform: 'capitalize' }}>
                           {item.category}
                         </td>
-                        <td style={{ fontWeight: 700, color: '#153f32' }}>
+                        <td style={{ fontWeight: 700, color: 'var(--color-text)' }}>
                           ₹{Number(item.amountRequested).toLocaleString()}
                         </td>
-                        <td style={{ fontSize: '13px', color: '#475569' }}>
+                        <td style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
                           {new Date(item.createdAt).toLocaleDateString()}
                         </td>
                         <td>
@@ -595,7 +595,7 @@ export default function Verifier({ user }) {
                   <article className="mobile-data-card" key={item.id}>
                     <div className="mobile-data-card-header">
                       <div>
-                        <strong style={{ fontSize: '16px', color: '#153f32', display: 'block' }}>{item.title}</strong>
+                        <strong style={{ fontSize: '16px', color: 'var(--color-text)', display: 'block' }}>{item.title}</strong>
                         <button
                           type="button"
                           className="btn-link"
@@ -610,7 +610,7 @@ export default function Verifier({ user }) {
 
                     <div className="mobile-data-card-row">
                       <span>Target Amount</span>
-                      <strong style={{ color: '#153f32', fontSize: '15px' }}>
+                      <strong style={{ color: 'var(--color-text)', fontSize: '15px' }}>
                         ₹{Number(item.amountRequested).toLocaleString()}
                       </strong>
                     </div>
@@ -659,7 +659,7 @@ export default function Verifier({ user }) {
               >
                 <ChevronLeft size={16} /> Previous
               </button>
-              <span style={{ fontSize: '13px', color: '#64748b' }}>
+              <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
                 Page {requestPage} of {requestPagination.totalPages}
               </span>
               <button

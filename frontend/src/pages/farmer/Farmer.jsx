@@ -114,11 +114,11 @@ export default function Farmer({ user, onLogout }) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 md:pb-8 flex flex-col justify-between">
+    <div className="min-h-dvh bg-background text-text pb-20 md:pb-8 flex flex-col justify-between">
       {/* Desktop / Tablet Sub-Navbar */}
       <nav
         aria-label="Farmer desktop navigation"
-        className="hidden md:flex items-center justify-center gap-2 py-3 px-4 bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs"
+        className="hidden md:flex items-center justify-center gap-2 py-3 px-4 bg-surface border-b border-border sticky top-[68px] z-30 shadow-xs"
       >
         <div className="flex items-center gap-1.5 max-w-2xl w-full justify-between">
           {navItems.map(({ key, label, icon: Icon, highlight }) => {
@@ -130,17 +130,17 @@ export default function Farmer({ user, onLogout }) {
                 key={key}
                 type="button"
                 onClick={() => handleNavigateTab(key)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   isActive
                     ? highlight
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      ? "bg-primary text-primary-foreground shadow-xs"
+                      : "bg-primary-soft text-primary-soft-text border border-primary/30"
                     : highlight
-                    ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "bg-primary-soft/60 text-primary-soft-text hover:bg-primary-soft"
+                    : "text-text-muted hover:text-text hover:bg-surface-muted"
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 shrink-0" />
                 <span>{label}</span>
               </button>
             );
@@ -205,7 +205,7 @@ export default function Farmer({ user, onLogout }) {
       {/* Mobile One-Handed Bottom Tab Bar (Fixed at bottom for ~360px+ viewport) */}
       <nav
         aria-label="Farmer mobile bottom navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 px-2 py-1 shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border px-2 py-1 shadow-lg"
       >
         <div className="flex items-center justify-around max-w-md mx-auto">
           {navItems.map(({ key, label, icon: Icon, highlight }) => {
@@ -219,18 +219,18 @@ export default function Farmer({ user, onLogout }) {
                 onClick={() => handleNavigateTab(key)}
                 className={`flex flex-col items-center justify-center flex-1 py-1.5 px-1 min-h-[48px] rounded-xl transition-all cursor-pointer ${
                   isActive
-                    ? "text-emerald-700 font-extrabold"
-                    : "text-slate-500 font-medium hover:text-slate-800"
+                    ? "text-primary font-extrabold"
+                    : "text-text-muted font-medium hover:text-text"
                 }`}
               >
                 <div
-                  className={`p-1 rounded-xl transition-colors ${
+                  className={`p-1.5 rounded-xl transition-colors ${
                     highlight
                       ? isActive
-                        ? "bg-emerald-600 text-white shadow-xs"
-                        : "bg-emerald-100 text-emerald-800"
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "bg-primary-soft text-primary-soft-text"
                       : isActive
-                      ? "bg-emerald-50 text-emerald-700"
+                      ? "bg-primary-soft text-primary-soft-text"
                       : ""
                   }`}
                 >

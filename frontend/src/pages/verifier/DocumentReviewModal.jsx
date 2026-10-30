@@ -159,10 +159,10 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
 
   if (loading) {
     return (
-      <div className="modal-overlay">
+      <div className="modal-overlay" role="dialog" aria-modal="true">
         <div className="modal-content">
           <div className="modal-body" style={{ textAlign: 'center', padding: '60px' }}>
-            <Clock size={32} style={{ margin: '0 auto 12px auto', color: '#1d684b' }} />
+            <Clock size={32} style={{ margin: '0 auto 12px auto', color: 'var(--color-primary)' }} />
             <p>Loading farmer verification details...</p>
           </div>
         </div>
@@ -172,11 +172,11 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
 
   if (error || !data) {
     return (
-      <div className="modal-overlay">
+      <div className="modal-overlay" role="dialog" aria-modal="true">
         <div className="modal-content">
           <div className="modal-header">
             <h2>Error Loading Record</h2>
-            <button className="modal-close-btn" onClick={onClose}><X size={20} /></button>
+            <button className="modal-close-btn" onClick={onClose} aria-label="Close modal"><X size={20} /></button>
           </div>
           <div className="modal-body">
             <p className="form-error">{error || 'Record unavailable'}</p>
@@ -194,14 +194,14 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
   function renderDocumentCard(doc, title, isMandatory) {
     if (!doc) {
       return (
-        <div className="doc-review-card" style={{ borderColor: '#fca5a5' }}>
+        <div className="doc-review-card" style={{ borderColor: 'var(--color-danger)' }}>
           <div className="doc-review-header">
             <h4 style={{ margin: 0, fontSize: '15px' }}>
-              {title} {isMandatory && <span style={{ color: '#dc2626' }}>* (Mandatory)</span>}
+              {title} {isMandatory && <span style={{ color: 'var(--color-danger)' }}>* (Mandatory)</span>}
             </h4>
             {renderStatusBadge('missing')}
           </div>
-          <p style={{ margin: '8px 0 0 0', color: '#64748b', fontSize: '13px' }}>
+          <p style={{ margin: '8px 0 0 0', color: 'var(--color-text-muted)', fontSize: '13px' }}>
             This required document has not been uploaded.
           </p>
         </div>
@@ -216,9 +216,9 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
         <div className="doc-review-header">
           <div>
             <h4 style={{ margin: '0 0 4px 0', fontSize: '15px' }}>
-              {title} {isMandatory && <span style={{ color: '#dc2626' }}>*</span>}
+              {title} {isMandatory && <span style={{ color: 'var(--color-danger)' }}>*</span>}
             </h4>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>
+            <span style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
               Type: {doc.type} | Size: {(doc.size / 1024).toFixed(1)} KB | Uploaded: {new Date(doc.createdAt).toLocaleDateString()}
             </span>
           </div>
@@ -245,7 +245,7 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
           </button>
         </div>
 
-        <div style={{ marginTop: '12px', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+        <div style={{ marginTop: '12px', borderTop: '1px solid var(--color-border)', paddingTop: '10px' }}>
           <input
             type="text"
             className="doc-reason-input"
@@ -289,14 +289,14 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
   }
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" role="dialog" aria-modal="true">
       <div className="modal-content">
         <div className="modal-header">
           <div>
             <h2>Review Farmer Documents: {farmer.name}</h2>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>ID: {farmer.id}</span>
+            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>ID: {farmer.id}</span>
           </div>
-          <button className="modal-close-btn" onClick={onClose}><X size={20} /></button>
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close modal"><X size={20} /></button>
         </div>
 
         <div className="modal-body">
@@ -335,7 +335,7 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
 
           {/* Mandatory Documents */}
           <div>
-            <h3 style={{ fontSize: '16px', color: '#153f32', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <h3 style={{ fontSize: '16px', color: 'var(--color-text)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <FileText size={17} /> Mandatory Documents Review
             </h3>
             {renderDocumentCard(mandatoryDocuments.aadhaar, 'Aadhaar Identification Card', true)}
@@ -345,7 +345,7 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
           {/* Supporting Documents */}
           {supportingDocuments && supportingDocuments.length > 0 && (
             <div>
-              <h3 style={{ fontSize: '16px', color: '#153f32', margin: '16px 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <h3 style={{ fontSize: '16px', color: 'var(--color-text)', margin: '16px 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FileText size={17} /> Additional Supporting Documents ({supportingDocuments.length})
               </h3>
               {supportingDocuments.map((doc, idx) =>
@@ -355,8 +355,8 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
           )}
 
           {/* Final Verification Section */}
-          <div className="info-section" style={{ background: canVerify ? '#f0fdf4' : '#fffbeb', borderColor: canVerify ? '#86efac' : '#fde68a' }}>
-            <h3 style={{ borderBottomColor: canVerify ? '#bbf7d0' : '#fef08a' }}>
+          <div className="info-section" style={{ background: canVerify ? 'var(--color-success-bg)' : 'var(--color-warning-bg)', borderColor: canVerify ? 'var(--color-success)' : 'var(--color-warning)' }}>
+            <h3 style={{ borderBottomColor: canVerify ? 'var(--color-success)' : 'var(--color-warning)' }}>
               <ShieldCheck size={17} /> Final Farmer Verification Decision
             </h3>
 
@@ -377,11 +377,11 @@ export default function DocumentReviewModal({ farmerId, onClose, onUpdated }) {
             )}
 
             <div style={{ marginBottom: '14px' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '6px' }}>
                 Decision Remarks / Reason (Required for rejection or info requests):
               </label>
               <textarea
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', minHeight: '64px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px', minHeight: '64px', boxSizing: 'border-box' }}
                 placeholder="Enter remarks or required information..."
                 value={farmerReason}
                 onChange={(e) => setFarmerReason(e.target.value)}

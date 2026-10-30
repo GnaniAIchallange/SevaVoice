@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowLeft, Globe, HeartHandshake, Lock, Mail, Phone, User } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -69,25 +70,36 @@ function RegisterDonor({ onBack, onLogin, onRegistered }) {
 
   return (
     <section className="login-panel" aria-labelledby="register-title">
-      <button className="back-link" type="button" onClick={onBack}>
-        Back
+      <button className="back-link inline-flex items-center gap-1.5" type="button" onClick={onBack}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        <span>Back to choice</span>
       </button>
-      <p className="eyebrow">Donor account</p>
+      <p className="eyebrow flex items-center gap-1.5">
+        <HeartHandshake size={14} className="text-primary" aria-hidden="true" />
+        Donor account
+      </p>
       <h1 id="register-title">Create account</h1>
 
       <form className="login-form" onSubmit={handleSubmit}>
-        <label htmlFor="register-name">Full name</label>
+        <label htmlFor="register-name" className="flex items-center gap-1.5">
+          <User size={14} className="text-primary" aria-hidden="true" />
+          <span>Full name</span>
+        </label>
         <input
           autoComplete="name"
           id="register-name"
           maxLength={100}
           name="name"
           onChange={updateField}
+          placeholder="Enter your full name"
           required
           value={form.name}
         />
 
-        <label htmlFor="register-phone">Phone number</label>
+        <label htmlFor="register-phone" className="flex items-center gap-1.5">
+          <Phone size={14} className="text-primary" aria-hidden="true" />
+          <span>Phone number (10 digits)</span>
+        </label>
         <input
           autoComplete="tel"
           id="register-phone"
@@ -95,23 +107,31 @@ function RegisterDonor({ onBack, onLogin, onRegistered }) {
           onChange={updateField}
           maxLength={10}
           pattern="[6-9][0-9]{9}"
+          placeholder="e.g. 9876543210"
           required
           type="tel"
           value={form.phone}
         />
 
-        <label htmlFor="register-email">Email (optional)</label>
+        <label htmlFor="register-email" className="flex items-center gap-1.5">
+          <Mail size={14} className="text-primary" aria-hidden="true" />
+          <span>Email (optional)</span>
+        </label>
         <input
           autoComplete="email"
           id="register-email"
           maxLength={254}
           name="email"
           onChange={updateField}
+          placeholder="e.g. yourname@example.com"
           type="email"
           value={form.email}
         />
 
-        <label htmlFor="register-language">Preferred language</label>
+        <label htmlFor="register-language" className="flex items-center gap-1.5">
+          <Globe size={14} className="text-primary" aria-hidden="true" />
+          <span>Preferred language</span>
+        </label>
         <select
           id="register-language"
           name="preferredLanguage"
@@ -119,11 +139,14 @@ function RegisterDonor({ onBack, onLogin, onRegistered }) {
           value={form.preferredLanguage}
         >
           <option value="en">English</option>
-          <option value="hi">Hindi</option>
-          <option value="mr">Marathi</option>
+          <option value="hi">Hindi (हिंदी)</option>
+          <option value="mr">Marathi (मराठी)</option>
         </select>
 
-        <label htmlFor="register-password">Password</label>
+        <label htmlFor="register-password" className="flex items-center gap-1.5">
+          <Lock size={14} className="text-primary" aria-hidden="true" />
+          <span>Password (min 8 chars)</span>
+        </label>
         <input
           autoComplete="new-password"
           id="register-password"
@@ -131,12 +154,16 @@ function RegisterDonor({ onBack, onLogin, onRegistered }) {
           minLength={8}
           name="password"
           onChange={updateField}
+          placeholder="Create a secure password"
           required
           type="password"
           value={form.password}
         />
 
-        <label htmlFor="register-confirm-password">Confirm password</label>
+        <label htmlFor="register-confirm-password" className="flex items-center gap-1.5">
+          <Lock size={14} className="text-primary" aria-hidden="true" />
+          <span>Confirm password</span>
+        </label>
         <input
           autoComplete="new-password"
           id="register-confirm-password"
@@ -144,15 +171,16 @@ function RegisterDonor({ onBack, onLogin, onRegistered }) {
           minLength={8}
           name="confirmPassword"
           onChange={updateField}
+          placeholder="Re-enter your password"
           required
           type="password"
           value={form.confirmPassword}
         />
 
         {error && (
-          <p className="form-error" role="alert">
+          <div className="p-3.5 rounded-xl bg-danger-soft border border-danger/30 text-danger-soft-text text-sm font-semibold mt-1" role="alert">
             {error}
-          </p>
+          </div>
         )}
 
         <button className="submit-button" disabled={isSubmitting} type="submit">

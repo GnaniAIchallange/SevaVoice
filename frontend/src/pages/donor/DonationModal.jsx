@@ -208,10 +208,10 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
         <div className="modal-header">
           <div>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <HeartHandshake size={22} color="#1d684b" />
+              <HeartHandshake size={22} style={{ color: 'var(--color-primary)' }} />
               Contribute with Razorpay
             </h2>
-            <span style={{ fontSize: '13px', color: '#64748b' }}>
+            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
               100% Direct Support for Verified Farmers
             </span>
           </div>
@@ -229,8 +229,8 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                   width: '64px',
                   height: '64px',
                   borderRadius: '50%',
-                  background: '#dcfce7',
-                  color: '#15803d',
+                  background: 'var(--color-success-bg)',
+                  color: 'var(--color-success)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -239,17 +239,17 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
               >
                 <CheckCircle2 size={36} />
               </div>
-              <h3 style={{ fontSize: '22px', color: '#153f32', margin: '0 0 6px 0', fontFamily: 'Georgia, serif' }}>
+              <h3 style={{ fontSize: '22px', color: 'var(--color-text)', margin: '0 0 6px 0' }}>
                 Payment Received!
               </h3>
-              <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 20px 0' }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '14px', margin: '0 0 20px 0' }}>
                 Your generous contribution has been securely transferred to empower this verified farmer.
               </p>
 
               <div
                 style={{
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
+                  background: 'var(--color-surface-muted)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '10px',
                   padding: '16px',
                   textAlign: 'left',
@@ -257,29 +257,29 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                   marginBottom: '20px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed #e2e8f0' }}>
-                  <span style={{ color: '#64748b' }}>Amount Contributed</span>
-                  <strong style={{ color: '#153f32', fontSize: '16px' }}>₹{Number(paymentSuccess.amount).toLocaleString()}</strong>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed var(--color-border)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Amount Contributed</span>
+                  <strong style={{ color: 'var(--color-text)', fontSize: '16px' }}>₹{Number(paymentSuccess.amount).toLocaleString()}</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed #e2e8f0' }}>
-                  <span style={{ color: '#64748b' }}>Beneficiary Farmer</span>
-                  <strong>{paymentSuccess.farmerName}</strong>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed var(--color-border)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Beneficiary Farmer</span>
+                  <strong style={{ color: 'var(--color-text)' }}>{paymentSuccess.farmerName}</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed #e2e8f0' }}>
-                  <span style={{ color: '#64748b' }}>Request Title</span>
-                  <span style={{ maxWidth: '240px', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed var(--color-border)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Request Title</span>
+                  <span style={{ maxWidth: '240px', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--color-text)' }}>
                     {paymentSuccess.requestTitle}
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed #e2e8f0' }}>
-                  <span style={{ color: '#64748b' }}>Razorpay Payment ID</span>
-                  <code style={{ fontSize: '12px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px dashed var(--color-border)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Razorpay Payment ID</span>
+                  <code style={{ fontSize: '12px', background: 'var(--color-surface)', color: 'var(--color-text)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
                     {paymentSuccess.paymentId}
                   </code>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0' }}>
-                  <span style={{ color: '#64748b' }}>Date & Time</span>
-                  <span>{new Date(paymentSuccess.date).toLocaleString()}</span>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Date & Time</span>
+                  <span style={{ color: 'var(--color-text)' }}>{new Date(paymentSuccess.date).toLocaleString()}</span>
                 </div>
               </div>
 
@@ -298,8 +298,8 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
               {/* Target Request Info Box */}
               <div
                 style={{
-                  background: '#f0fdf4',
-                  border: '1px solid #bbf7d0',
+                  background: 'var(--color-success-bg)',
+                  border: '1px solid var(--color-success)',
                   borderRadius: '10px',
                   padding: '14px 16px',
                   marginBottom: '18px',
@@ -307,18 +307,19 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
                   <div>
-                    <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#153f32', fontFamily: 'Georgia, serif' }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '16px', color: 'var(--color-text)' }}>
                       {request.title || 'Agricultural Assistance Request'}
                     </h4>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#166534' }}>
+                    <p style={{ margin: 0, fontSize: '13px', color: 'var(--color-text-muted)' }}>
                       Farmer: <strong>{request.farmer?.name || 'Verified Farmer'}</strong>
                       {request.farmer?.district ? ` (${request.farmer.district}, ${request.farmer.state})` : ''}
                     </p>
                   </div>
                   <span
                     style={{
-                      background: '#dcfce7',
-                      color: '#15803d',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-success)',
+                      border: '1px solid var(--color-success)',
                       fontSize: '11px',
                       fontWeight: 700,
                       padding: '3px 8px',
@@ -333,19 +334,19 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '12.5px', color: '#475569' }}>
-                  <span>Requested: <strong>₹{Number(request.amountRequested || 0).toLocaleString()}</strong></span>
-                  <span>Remaining: <strong style={{ color: '#15803d' }}>₹{Number(remainingGoal).toLocaleString()}</strong></span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '12.5px', color: 'var(--color-text-muted)' }}>
+                  <span>Requested: <strong style={{ color: 'var(--color-text)' }}>₹{Number(request.amountRequested || 0).toLocaleString()}</strong></span>
+                  <span>Remaining: <strong style={{ color: 'var(--color-success)' }}>₹{Number(remainingGoal).toLocaleString()}</strong></span>
                 </div>
               </div>
 
               {/* Amount Selection */}
               <div style={{ marginBottom: '18px', textAlign: 'center' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#475569', marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '8px' }}>
                   Contribution Amount (INR)
                 </label>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '26px', fontWeight: 700, color: '#153f32' }}>₹</span>
+                  <span style={{ fontSize: '26px', fontWeight: 700, color: 'var(--color-text)' }}>₹</span>
                   <input
                     type="text"
                     className="donation-amount-input"
@@ -357,7 +358,7 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                   />
                 </div>
                 {inputError && (
-                  <p style={{ color: '#dc2626', fontSize: '12px', margin: '4px 0 0 0' }}>
+                  <p style={{ color: 'var(--color-danger)', fontSize: '12px', margin: '4px 0 0 0' }}>
                     {inputError}
                   </p>
                 )}
@@ -368,16 +369,12 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                     <button
                       key={preset}
                       type="button"
-                      className={`btn-secondary preset-btn ${pledgeAmount === preset ? 'active-preset' : ''}`}
+                      className={`preset-btn ${pledgeAmount === preset ? 'active-preset' : ''}`}
                       onClick={() => {
                         setPledgeAmount(preset);
                         setInputError('');
                       }}
                       disabled={isProcessing}
-                      style={{
-                        background: pledgeAmount === preset ? '#153f32' : '',
-                        color: pledgeAmount === preset ? '#ffffff' : '',
-                      }}
                     >
                       ₹{Number(preset).toLocaleString()}
                     </button>
@@ -386,14 +383,14 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
               </div>
 
               {/* Donor Contact & Details (Prefilled or editable) */}
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px', marginBottom: '16px' }}>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '10px' }}>
+              <div style={{ background: 'var(--color-surface-muted)', border: '1px solid var(--color-border)', borderRadius: '10px', padding: '14px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '10px' }}>
                   Donor Information (Optional)
                 </span>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '10px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Your Name</label>
+                    <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Your Name</label>
                     <input
                       type="text"
                       className="form-input"
@@ -401,11 +398,11 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                       onChange={(e) => setDonorName(e.target.value)}
                       placeholder="e.g. Ramesh Kulkarni"
                       disabled={isProcessing || isAnonymous}
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px' }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Phone Number</label>
+                    <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Phone Number</label>
                     <input
                       type="text"
                       className="form-input"
@@ -413,13 +410,13 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                       onChange={(e) => setDonorPhone(e.target.value)}
                       placeholder="10-digit mobile"
                       disabled={isProcessing || isAnonymous}
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px' }}
                     />
                   </div>
                 </div>
 
                 <div style={{ marginBottom: '10px' }}>
-                  <label style={{ display: 'block', fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Email Address (for receipt)</label>
+                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Email Address (for receipt)</label>
                   <input
                     type="email"
                     className="form-input"
@@ -427,12 +424,12 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                     onChange={(e) => setDonorEmail(e.target.value)}
                     placeholder="donor@example.com"
                     disabled={isProcessing || isAnonymous}
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }}
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px' }}
                   />
                 </div>
 
                 <div style={{ marginBottom: '10px' }}>
-                  <label style={{ display: 'block', fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Words of Support / Message</label>
+                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Words of Support / Message</label>
                   <input
                     type="text"
                     className="form-input"
@@ -440,11 +437,11 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Wishing you a prosperous harvest season!"
                     disabled={isProcessing}
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }}
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px' }}
                   />
                 </div>
 
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#475569', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
                   <input
                     type="checkbox"
                     checked={isAnonymous}
@@ -457,7 +454,7 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
 
               {/* Error Alert */}
               {errorMessage && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#dc2626', fontSize: '13px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ background: 'var(--color-danger-bg)', border: '1px solid var(--color-danger)', borderRadius: '8px', padding: '10px 14px', color: 'var(--color-danger)', fontSize: '13px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <AlertCircle size={16} />
                   <span>{errorMessage}</span>
                 </div>
@@ -471,9 +468,9 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                   justifyContent: 'center',
                   gap: '8px',
                   fontSize: '12px',
-                  color: '#475569',
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
+                  color: 'var(--color-text-muted)',
+                  background: 'var(--color-surface-muted)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: '6px',
                   padding: '8px',
                   marginBottom: '18px',
@@ -500,7 +497,6 @@ export default function DonationModal({ request, user, onClose, onSuccess }) {
                   disabled={isProcessing || !pledgeAmount || parseInt(pledgeAmount, 10) <= 0}
                   style={{
                     flex: 2,
-                    background: '#153f32',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

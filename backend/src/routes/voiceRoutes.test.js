@@ -302,3 +302,43 @@ test("returns a generic 502 for upstream failures", async () => {
     },
   );
 });
+
+test("accepts and normalizes short language codes (mr, hi, en) for STT and TTS", async () => {
+  let capturedSttLang = null;
+  let capturedTtsLang = null;
+
+  await withServer(
+    createService({
+      transcribe: async ({ language }) => {
+        capturedSttLang = language;
+        return "transcribed text";
+      },
+      synthesize: async ({ language }) => {
+        capturedTtsLang = language;
+        return Buffer.from("audio wav");
+      },
+    }),
+    async (baseUrl) => {
+      for (const [shortCode, expected] of [
+        ["hi", "hi-IN"],
+        ["mr", "mr-IN"],
+        ["en", "en-IN"],
+      ]) {
+        const sttRes = await fetch(`${baseUrl}/api/voice/stt`, {
+          method: "POST",
+          body: sttForm({ language: shortCode }),
+        });
+        assert.equal(sttRes.status, 200);
+        assert.equal(capturedSttLang, expected);
+
+        const ttsRes = await fetch(`${baseUrl}/api/voice/tts`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: "Test text", language: shortCode }),
+        });
+        assert.equal(ttsRes.status, 200);
+        assert.equal(capturedTtsLang, expected);
+      }
+    },
+  );
+});

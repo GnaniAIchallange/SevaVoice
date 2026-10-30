@@ -1,4 +1,4 @@
-/* Donor Interface Mobile-First Responsive Styles */
+/* Donor Interface Mobile-First Responsive Styles - Unified Design System */
 
 .donor-container {
   width: 100%;
@@ -6,24 +6,25 @@
   margin: 0 auto;
   padding: clamp(16px, 3vw, 36px) clamp(12px, 3vw, 28px) 80px;
   box-sizing: border-box;
-  color: #1e293b;
+  color: var(--color-text);
 }
 
 /* Hero */
 .donor-hero {
-  background: linear-gradient(135deg, #153f32 0%, #1e5a47 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1e5a47 100%);
   color: #ffffff;
-  border-radius: 14px;
+  border-radius: var(--radius-lg, 16px);
   padding: clamp(22px, 4vw, 36px) clamp(18px, 4vw, 32px);
   margin-bottom: clamp(20px, 3vw, 32px);
-  box-shadow: 0 4px 12px rgba(21, 63, 50, 0.15);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(21, 63, 50, 0.15));
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .donor-hero .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #a7f3d0;
+  color: var(--color-primary-light, #a7f3d0);
   font-size: clamp(11px, 2vw, 13px);
   font-weight: 700;
   text-transform: uppercase;
@@ -32,17 +33,16 @@
 }
 
 .donor-hero h1 {
-  font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(24px, 4.5vw, 36px);
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 10px 0;
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .donor-hero p {
-  color: #e2e8f0;
-  font-size: clamp(13.5px, 2vw, 16px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(14px, 2vw, 16px);
   max-width: 760px;
   line-height: 1.6;
   margin: 0;
@@ -52,7 +52,7 @@
 .donor-stats-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: clamp(10px, 2vw, 18px);
+  gap: clamp(12px, 2vw, 18px);
   margin-bottom: clamp(20px, 3vw, 32px);
 }
 
@@ -63,58 +63,59 @@
 }
 
 .donor-stat-box {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 12px);
   padding: clamp(14px, 2vw, 20px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: border-color 0.15s ease;
 }
 
 .donor-stat-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .donor-stat-label {
   font-size: clamp(12px, 1.8vw, 13px);
   font-weight: 600;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 .donor-stat-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: #f0fdf4;
-  color: #1d684b;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .donor-stat-number {
   font-size: clamp(24px, 4vw, 32px);
   font-weight: 700;
-  color: #153f32;
+  color: var(--color-text);
   line-height: 1.1;
 }
 
 /* Filter Controls Bar */
 .donor-filters {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 16px);
   padding: clamp(14px, 2.5vw, 20px);
   margin-bottom: clamp(20px, 3vw, 28px);
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--shadow-sm);
 }
 
 .filters-row-top {
@@ -148,24 +149,27 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--color-text-dim);
   pointer-events: none;
 }
 
 .donor-search-input {
   width: 100%;
-  padding: 10px 14px 10px 36px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 10px 14px 10px 38px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 10px);
+  color: var(--color-text);
   font-size: 14px;
   outline: none;
   min-height: 44px;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .donor-search-input:focus {
-  border-color: #1d684b;
-  box-shadow: 0 0 0 2px rgba(29, 104, 75, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-ring);
 }
 
 .sort-wrapper {
@@ -184,15 +188,16 @@
 .filter-select {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 10px);
   font-size: 13.5px;
-  background: #ffffff;
-  color: #334155;
+  color: var(--color-text);
   outline: none;
   cursor: pointer;
   min-height: 44px;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 @media (min-width: 768px) {
@@ -203,7 +208,8 @@
 }
 
 .filter-select:focus {
-  border-color: #1d684b;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-ring);
 }
 
 /* Category Chips */
@@ -214,29 +220,31 @@
 }
 
 .category-chip {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
   padding: 6px 14px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
-  color: #475569;
+  color: var(--color-text-muted);
   cursor: pointer;
   text-transform: capitalize;
-  min-height: 36px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .category-chip:hover {
-  background: #e2e8f0;
+  background: var(--color-border);
+  color: var(--color-text);
 }
 
 .category-chip.active {
-  background: #1d684b;
-  border-color: #1d684b;
-  color: #ffffff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Request Cards Grid */
@@ -260,20 +268,21 @@
 }
 
 .request-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 16px);
   padding: clamp(16px, 2.5vw, 22px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .request-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
 }
 
 .request-card-header {
@@ -285,15 +294,15 @@
 }
 
 .category-pill {
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-light);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -303,10 +312,10 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-  border-radius: 6px;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-sm, 6px);
   font-size: 11px;
   font-weight: 600;
   padding: 4px 8px;
@@ -314,17 +323,16 @@
 }
 
 .request-card-title {
-  font-family: Georgia, serif;
   font-size: clamp(16px, 2vw, 18px);
   font-weight: 600;
-  color: #153f32;
+  color: var(--color-text);
   margin: 0 0 6px 0;
   line-height: 1.35;
 }
 
 .request-card-farmer {
   font-size: 13px;
-  color: #64748b;
+  color: var(--color-text-muted);
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -333,13 +341,13 @@
 }
 
 .request-card-farmer strong {
-  color: #334155;
+  color: var(--color-text);
 }
 
 .request-card-reason {
   font-size: 13.5px;
   line-height: 1.55;
-  color: #475569;
+  color: var(--color-text-muted);
   margin-bottom: 16px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -349,8 +357,9 @@
 
 /* Funding Progress */
 .funding-progress-box {
-  background: #f8fafc;
-  border-radius: 10px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 10px);
   padding: 12px 14px;
   margin-bottom: 16px;
 }
@@ -360,26 +369,27 @@
   justify-content: space-between;
   font-size: 12.5px;
   margin-bottom: 6px;
+  color: var(--color-text-muted);
 }
 
 .funding-amount {
   font-size: 15px;
   font-weight: 700;
-  color: #153f32;
+  color: var(--color-text);
 }
 
 .progress-bar-bg {
-  background: #e2e8f0;
-  border-radius: 4px;
+  background: var(--color-border);
+  border-radius: 9999px;
   height: 6px;
   overflow: hidden;
 }
 
 .progress-bar-fill {
-  background: #1d684b;
+  background: var(--color-primary);
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
 }
 
 /* Card Actions */
@@ -401,9 +411,9 @@
 
 /* Public Trust Notice in Modal */
 .public-trust-notice {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 10px;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-md, 10px);
   padding: clamp(12px, 2vw, 16px);
   margin-bottom: 16px;
 }
@@ -412,7 +422,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #166534;
+  color: var(--color-success);
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 4px;
@@ -421,22 +431,22 @@
 .public-trust-notice p {
   margin: 0;
   font-size: 13px;
-  color: #166534;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
-/* Nonfunctional Donation Modal */
+/* Donation Modal Elements */
 .donation-modal-box {
   text-align: center;
   padding: 6px 0;
 }
 
 .donation-placeholder-alert {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: 10px;
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md, 10px);
   padding: clamp(14px, 2vw, 18px);
-  color: #92400e;
+  color: var(--color-text);
   text-align: left;
   margin: 18px 0;
   font-size: 13.5px;
@@ -450,17 +460,20 @@
   font-weight: 700;
   text-align: center;
   padding: 10px;
-  border: 2px solid #cbd5e1;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md, 10px);
   margin: 8px auto;
-  color: #153f32;
+  color: var(--color-text);
   outline: none;
   min-height: 48px;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .donation-amount-input:focus {
-  border-color: #1d684b;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-ring);
 }
 
 .preset-buttons-row {
@@ -475,19 +488,66 @@
   font-size: 13px;
   padding: 8px 14px;
   min-height: 40px;
-  border-radius: 8px;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preset-btn:hover {
+  background: var(--color-surface-muted);
+  border-color: var(--color-primary);
+}
+
+.preset-btn.active-preset {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-color: var(--color-primary);
 }
 
 /* History */
 .history-empty-note {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 16px);
   padding: clamp(28px, 5vw, 48px) 20px;
   text-align: center;
-  color: #64748b;
+  color: var(--color-text-muted);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+/* Razorpay Modal Responsive Enhancements */
+.razorpay-layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+@media (min-width: 600px) {
+  .razorpay-layout-container {
+    flex-direction: row;
+  }
+}
+
+.razorpay-tabs-col {
+  width: 100%;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  display: flex;
+  overflow-x: auto;
+}
+
+@media (min-width: 600px) {
+  .razorpay-tabs-col {
+    width: 200px;
+    border-bottom: none;
+    border-right: 1px solid var(--color-border);
+    flex-direction: column;
+    overflow-x: visible;
+  }
 }

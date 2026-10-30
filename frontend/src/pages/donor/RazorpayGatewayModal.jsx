@@ -103,7 +103,7 @@ export default function RazorpayGatewayModal({
   }
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 1100 }}>
+    <div className="modal-overlay" style={{ zIndex: 1100 }} role="dialog" aria-modal="true">
       <div
         className="modal-content"
         style={{
@@ -111,11 +111,12 @@ export default function RazorpayGatewayModal({
           padding: 0,
           borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 25px 50px -12px rgba(12, 35, 64, 0.45)',
-          background: '#ffffff',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.45)',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
         }}
       >
-        {/* Razorpay Authentic Blue Header */}
+        {/* Razorpay Authentic Header */}
         <div
           style={{
             background: 'linear-gradient(135deg, #0c2340 0%, #173860 100%)',
@@ -139,17 +140,17 @@ export default function RazorpayGatewayModal({
                 boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
               }}
             >
-              {/* Razorpay Official Icon Representation */}
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M14.5 2L5 15H11.5L9.5 22L19 9H12.5L14.5 2Z" fill="#0c2340" />
               </svg>
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '0.02em' }}>Razorpay</span>
+                <span style={{ fontSize: '15px', fontWeight: 700, letterSpacing: '0.02em', color: '#ffffff' }}>Razorpay</span>
                 <span
                   style={{
                     background: 'rgba(255,255,255,0.18)',
+                    color: '#ffffff',
                     fontSize: '10px',
                     padding: '2px 6px',
                     borderRadius: '4px',
@@ -183,22 +184,22 @@ export default function RazorpayGatewayModal({
                 height: '72px',
                 margin: '0 auto 20px',
                 borderRadius: '50%',
-                background: '#eff6ff',
+                background: 'var(--color-surface-muted)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0284c7',
+                color: 'var(--color-primary)',
               }}
             >
               <Loader2 size={40} className="spinner" />
             </div>
-            <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', color: '#0c2340', fontFamily: 'Georgia, serif' }}>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', color: 'var(--color-text)' }}>
               Razorpay Payment in Progress
             </h3>
-            <p style={{ color: '#0284c7', fontWeight: 600, fontSize: '14px', margin: '0 0 8px 0' }}>
+            <p style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '14px', margin: '0 0 8px 0' }}>
               {authStep}
             </p>
-            <p style={{ color: '#64748b', fontSize: '12.5px', margin: 0 }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '12.5px', margin: 0 }}>
               Please do not refresh this window or hit back. Communicating with banking gateway.
             </p>
           </div>
@@ -208,21 +209,21 @@ export default function RazorpayGatewayModal({
             {/* Beneficiary Pill */}
             <div
               style={{
-                background: '#f8fafc',
-                borderBottom: '1px solid #e2e8f0',
+                background: 'var(--color-surface-muted)',
+                borderBottom: '1px solid var(--color-border)',
                 padding: '10px 24px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 fontSize: '12.5px',
-                color: '#475569',
+                color: 'var(--color-text-muted)',
               }}
             >
               <span>
-                Supporting: <strong>{request?.title || 'Agricultural Assistance'}</strong>
+                Supporting: <strong style={{ color: 'var(--color-text)' }}>{request?.title || 'Agricultural Assistance'}</strong>
               </span>
               <span>
-                Farmer: <strong>{request?.farmer?.name || 'Verified Beneficiary'}</strong>
+                Farmer: <strong style={{ color: 'var(--color-text)' }}>{request?.farmer?.name || 'Verified Beneficiary'}</strong>
               </span>
             </div>
 
@@ -230,10 +231,10 @@ export default function RazorpayGatewayModal({
             {errorMsg && (
               <div
                 style={{
-                  background: '#fef2f2',
-                  borderBottom: '1px solid #fecaca',
+                  background: 'var(--color-danger-bg)',
+                  borderBottom: '1px solid var(--color-danger)',
                   padding: '10px 24px',
-                  color: '#dc2626',
+                  color: 'var(--color-danger)',
                   fontSize: '13px',
                   display: 'flex',
                   alignItems: 'center',
@@ -246,17 +247,9 @@ export default function RazorpayGatewayModal({
             )}
 
             {/* Payment Methods Layout */}
-            <div style={{ display: 'flex', minHeight: '360px' }}>
+            <div className="razorpay-layout-container">
               {/* Left Method Tabs */}
-              <div
-                style={{
-                  width: '200px',
-                  borderRight: '1px solid #e2e8f0',
-                  background: '#f8fafc',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
+              <div className="razorpay-tabs-col">
                 <button
                   type="button"
                   onClick={() => setActiveMethod('upi')}
@@ -265,20 +258,21 @@ export default function RazorpayGatewayModal({
                     alignItems: 'center',
                     gap: '10px',
                     padding: '16px',
-                    background: activeMethod === 'upi' ? '#ffffff' : 'transparent',
+                    background: activeMethod === 'upi' ? 'var(--color-surface)' : 'transparent',
                     border: 'none',
-                    borderLeft: activeMethod === 'upi' ? '4px solid #0c2340' : '4px solid transparent',
+                    borderLeft: activeMethod === 'upi' ? '4px solid var(--color-primary)' : '4px solid transparent',
                     fontWeight: activeMethod === 'upi' ? 700 : 500,
-                    color: activeMethod === 'upi' ? '#0c2340' : '#475569',
+                    color: activeMethod === 'upi' ? 'var(--color-text)' : 'var(--color-text-muted)',
                     fontSize: '13.5px',
                     cursor: 'pointer',
                     textAlign: 'left',
+                    minWidth: '120px',
                   }}
                 >
-                  <Smartphone size={18} color={activeMethod === 'upi' ? '#0c2340' : '#64748b'} />
+                  <Smartphone size={18} style={{ color: activeMethod === 'upi' ? 'var(--color-primary)' : 'var(--color-text-muted)' }} />
                   <div>
                     <div>UPI / QR</div>
-                    <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 500 }}>Fast & Instant</div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-success)', fontWeight: 500 }}>Fast & Instant</div>
                   </div>
                 </button>
 
@@ -290,20 +284,21 @@ export default function RazorpayGatewayModal({
                     alignItems: 'center',
                     gap: '10px',
                     padding: '16px',
-                    background: activeMethod === 'card' ? '#ffffff' : 'transparent',
+                    background: activeMethod === 'card' ? 'var(--color-surface)' : 'transparent',
                     border: 'none',
-                    borderLeft: activeMethod === 'card' ? '4px solid #0c2340' : '4px solid transparent',
+                    borderLeft: activeMethod === 'card' ? '4px solid var(--color-primary)' : '4px solid transparent',
                     fontWeight: activeMethod === 'card' ? 700 : 500,
-                    color: activeMethod === 'card' ? '#0c2340' : '#475569',
+                    color: activeMethod === 'card' ? 'var(--color-text)' : 'var(--color-text-muted)',
                     fontSize: '13.5px',
                     cursor: 'pointer',
                     textAlign: 'left',
+                    minWidth: '120px',
                   }}
                 >
-                  <CreditCard size={18} color={activeMethod === 'card' ? '#0c2340' : '#64748b'} />
+                  <CreditCard size={18} style={{ color: activeMethod === 'card' ? 'var(--color-primary)' : 'var(--color-text-muted)' }} />
                   <div>
                     <div>Cards</div>
-                    <div style={{ fontSize: '11px', color: '#64748b' }}>Visa, Master, RuPay</div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Visa, Master, RuPay</div>
                   </div>
                 </button>
 
@@ -315,20 +310,21 @@ export default function RazorpayGatewayModal({
                     alignItems: 'center',
                     gap: '10px',
                     padding: '16px',
-                    background: activeMethod === 'netbanking' ? '#ffffff' : 'transparent',
+                    background: activeMethod === 'netbanking' ? 'var(--color-surface)' : 'transparent',
                     border: 'none',
-                    borderLeft: activeMethod === 'netbanking' ? '4px solid #0c2340' : '4px solid transparent',
+                    borderLeft: activeMethod === 'netbanking' ? '4px solid var(--color-primary)' : '4px solid transparent',
                     fontWeight: activeMethod === 'netbanking' ? 700 : 500,
-                    color: activeMethod === 'netbanking' ? '#0c2340' : '#475569',
+                    color: activeMethod === 'netbanking' ? 'var(--color-text)' : 'var(--color-text-muted)',
                     fontSize: '13.5px',
                     cursor: 'pointer',
                     textAlign: 'left',
+                    minWidth: '120px',
                   }}
                 >
-                  <Building2 size={18} color={activeMethod === 'netbanking' ? '#0c2340' : '#64748b'} />
+                  <Building2 size={18} style={{ color: activeMethod === 'netbanking' ? 'var(--color-primary)' : 'var(--color-text-muted)' }} />
                   <div>
                     <div>Net Banking</div>
-                    <div style={{ fontSize: '11px', color: '#64748b' }}>All Indian Banks</div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>All Indian Banks</div>
                   </div>
                 </button>
               </div>
@@ -338,18 +334,18 @@ export default function RazorpayGatewayModal({
                 {/* 1. UPI TAB */}
                 {activeMethod === 'upi' && (
                   <div>
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
                       <button
                         type="button"
                         onClick={() => setUpiSubMethod('qr')}
                         style={{
-                          padding: '6px 12px',
+                          padding: '6px 14px',
                           borderRadius: '20px',
                           fontSize: '12px',
                           fontWeight: 600,
-                          background: upiSubMethod === 'qr' ? '#0c2340' : '#f1f5f9',
-                          color: upiSubMethod === 'qr' ? '#ffffff' : '#475569',
-                          border: 'none',
+                          background: upiSubMethod === 'qr' ? 'var(--color-primary)' : 'var(--color-surface-muted)',
+                          color: upiSubMethod === 'qr' ? 'var(--color-primary-foreground)' : 'var(--color-text-muted)',
+                          border: '1px solid var(--color-border)',
                           cursor: 'pointer',
                         }}
                       >
@@ -359,13 +355,13 @@ export default function RazorpayGatewayModal({
                         type="button"
                         onClick={() => setUpiSubMethod('apps')}
                         style={{
-                          padding: '6px 12px',
+                          padding: '6px 14px',
                           borderRadius: '20px',
                           fontSize: '12px',
                           fontWeight: 600,
-                          background: upiSubMethod === 'apps' ? '#0c2340' : '#f1f5f9',
-                          color: upiSubMethod === 'apps' ? '#ffffff' : '#475569',
-                          border: 'none',
+                          background: upiSubMethod === 'apps' ? 'var(--color-primary)' : 'var(--color-surface-muted)',
+                          color: upiSubMethod === 'apps' ? 'var(--color-primary-foreground)' : 'var(--color-text-muted)',
+                          border: '1px solid var(--color-border)',
                           cursor: 'pointer',
                         }}
                       >
@@ -375,13 +371,13 @@ export default function RazorpayGatewayModal({
                         type="button"
                         onClick={() => setUpiSubMethod('id')}
                         style={{
-                          padding: '6px 12px',
+                          padding: '6px 14px',
                           borderRadius: '20px',
                           fontSize: '12px',
                           fontWeight: 600,
-                          background: upiSubMethod === 'id' ? '#0c2340' : '#f1f5f9',
-                          color: upiSubMethod === 'id' ? '#ffffff' : '#475569',
-                          border: 'none',
+                          background: upiSubMethod === 'id' ? 'var(--color-primary)' : 'var(--color-surface-muted)',
+                          color: upiSubMethod === 'id' ? 'var(--color-primary-foreground)' : 'var(--color-text-muted)',
+                          border: '1px solid var(--color-border)',
                           cursor: 'pointer',
                         }}
                       >
@@ -397,14 +393,12 @@ export default function RazorpayGatewayModal({
                             background: '#ffffff',
                             padding: '12px',
                             borderRadius: '12px',
-                            border: '2px solid #e2e8f0',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                            border: '2px solid var(--color-border)',
+                            boxShadow: 'var(--shadow-sm)',
                           }}
                         >
-                          {/* SVG QR Code Simulation with Indian Rupee symbol */}
                           <svg width="150" height="150" viewBox="0 0 150 150">
                             <rect width="150" height="150" fill="#ffffff" />
-                            {/* Corner squares */}
                             <rect x="10" y="10" width="36" height="36" fill="#0c2340" />
                             <rect x="16" y="16" width="24" height="24" fill="#ffffff" />
                             <rect x="22" y="22" width="12" height="12" fill="#0c2340" />
@@ -417,28 +411,25 @@ export default function RazorpayGatewayModal({
                             <rect x="16" y="110" width="24" height="24" fill="#ffffff" />
                             <rect x="22" y="116" width="12" height="12" fill="#0c2340" />
 
-                            {/* Data grid patterns */}
                             <rect x="56" y="16" width="8" height="8" fill="#0c2340" />
                             <rect x="72" y="16" width="8" height="8" fill="#0c2340" />
                             <rect x="88" y="16" width="8" height="8" fill="#0c2340" />
                             <rect x="56" y="32" width="16" height="8" fill="#0c2340" />
                             <rect x="80" y="32" width="8" height="16" fill="#0c2340" />
 
-                            {/* Center Logo */}
                             <circle cx="75" cy="75" r="18" fill="#0c2340" />
                             <text x="75" y="81" fill="#38bdf8" fontSize="18" fontWeight="bold" textAnchor="middle">₹</text>
 
-                            {/* Bottom patterns */}
                             <rect x="56" y="104" width="12" height="12" fill="#0c2340" />
                             <rect x="80" y="116" width="16" height="8" fill="#0c2340" />
                             <rect x="110" y="70" width="24" height="8" fill="#0c2340" />
                             <rect x="104" y="100" width="12" height="20" fill="#0c2340" />
                           </svg>
                         </div>
-                        <p style={{ margin: '10px 0 4px 0', fontSize: '13px', fontWeight: 600, color: '#0c2340' }}>
+                        <p style={{ margin: '10px 0 4px 0', fontSize: '13px', fontWeight: 600, color: 'var(--color-text)' }}>
                           Scan QR Code with Google Pay, PhonePe, Paytm, or BHIM
                         </p>
-                        <p style={{ margin: '0 0 16px 0', fontSize: '11.5px', color: '#64748b' }}>
+                        <p style={{ margin: '0 0 16px 0', fontSize: '11.5px', color: 'var(--color-text-muted)' }}>
                           Real-time QR code linked directly to SevaVoice trust escrow
                         </p>
                         <button
@@ -446,7 +437,6 @@ export default function RazorpayGatewayModal({
                           className="btn-primary"
                           onClick={() => handleExecutePayment('upi_qr')}
                           style={{
-                            background: '#0c2340',
                             width: '100%',
                             padding: '11px',
                             borderRadius: '8px',
@@ -460,7 +450,7 @@ export default function RazorpayGatewayModal({
 
                     {upiSubMethod === 'apps' && (
                       <div>
-                        <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 12px 0' }}>
+                        <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', margin: '0 0 12px 0' }}>
                           Choose your preferred UPI application:
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
@@ -477,9 +467,9 @@ export default function RazorpayGatewayModal({
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
                                 padding: '12px',
-                                border: selectedUpiApp === app.id ? '2px solid #0c2340' : '1px solid #e2e8f0',
+                                border: selectedUpiApp === app.id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
                                 borderRadius: '10px',
-                                background: selectedUpiApp === app.id ? '#f0fdf4' : '#ffffff',
+                                background: selectedUpiApp === app.id ? 'var(--color-surface-muted)' : 'var(--color-surface)',
                                 cursor: 'pointer',
                               }}
                             >
@@ -491,8 +481,8 @@ export default function RazorpayGatewayModal({
                                   onChange={() => setSelectedUpiApp(app.id)}
                                 />
                                 <div>
-                                  <strong style={{ fontSize: '13.5px', color: '#0c2340' }}>{app.name}</strong>
-                                  <div style={{ fontSize: '11.5px', color: '#64748b' }}>{app.sub}</div>
+                                  <strong style={{ fontSize: '13.5px', color: 'var(--color-text)' }}>{app.name}</strong>
+                                  <div style={{ fontSize: '11.5px', color: 'var(--color-text-muted)' }}>{app.sub}</div>
                                 </div>
                               </div>
                               <span style={{ fontSize: '18px' }}>{app.icon}</span>
@@ -504,7 +494,6 @@ export default function RazorpayGatewayModal({
                           className="btn-primary"
                           onClick={() => handleExecutePayment(`upi_${selectedUpiApp}`)}
                           style={{
-                            background: '#0c2340',
                             width: '100%',
                             padding: '11px',
                             borderRadius: '8px',
@@ -518,7 +507,7 @@ export default function RazorpayGatewayModal({
 
                     {upiSubMethod === 'id' && (
                       <div>
-                        <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                        <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '6px' }}>
                           Virtual Payment Address (VPA / UPI ID)
                         </label>
                         <input
@@ -529,7 +518,9 @@ export default function RazorpayGatewayModal({
                           style={{
                             width: '100%',
                             padding: '10px 12px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid var(--color-border)',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text)',
                             borderRadius: '8px',
                             fontSize: '13.5px',
                             boxSizing: 'border-box',
@@ -541,7 +532,6 @@ export default function RazorpayGatewayModal({
                           className="btn-primary"
                           onClick={() => handleExecutePayment('upi_vpa')}
                           style={{
-                            background: '#0c2340',
                             width: '100%',
                             padding: '11px',
                             borderRadius: '8px',
@@ -559,14 +549,14 @@ export default function RazorpayGatewayModal({
                 {activeMethod === 'card' && (
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '13px', color: '#64748b' }}>Card Details</span>
+                      <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Card Details</span>
                       <button
                         type="button"
                         onClick={fillTestCard}
                         style={{
-                          background: '#eff6ff',
-                          color: '#1d4ed8',
-                          border: '1px solid #bfdbfe',
+                          background: 'var(--color-surface-muted)',
+                          color: 'var(--color-primary)',
+                          border: '1px solid var(--color-border)',
                           padding: '3px 8px',
                           borderRadius: '4px',
                           fontSize: '11.5px',
@@ -579,7 +569,7 @@ export default function RazorpayGatewayModal({
                     </div>
 
                     <div style={{ marginBottom: '12px' }}>
-                      <label style={{ display: 'block', fontSize: '12px', color: '#475569', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                         Card Number
                       </label>
                       <input
@@ -590,7 +580,9 @@ export default function RazorpayGatewayModal({
                         style={{
                           width: '100%',
                           padding: '10px 12px',
-                          border: '1px solid #cbd5e1',
+                          border: '1px solid var(--color-border)',
+                          background: 'var(--color-surface)',
+                          color: 'var(--color-text)',
                           borderRadius: '8px',
                           fontSize: '14px',
                           letterSpacing: '0.05em',
@@ -601,7 +593,7 @@ export default function RazorpayGatewayModal({
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
                       <div>
-                        <label style={{ display: 'block', fontSize: '12px', color: '#475569', marginBottom: '4px' }}>
+                        <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                           Expiry (MM/YY)
                         </label>
                         <input
@@ -612,7 +604,9 @@ export default function RazorpayGatewayModal({
                           style={{
                             width: '100%',
                             padding: '10px 12px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid var(--color-border)',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text)',
                             borderRadius: '8px',
                             fontSize: '13.5px',
                             boxSizing: 'border-box',
@@ -620,7 +614,7 @@ export default function RazorpayGatewayModal({
                         />
                       </div>
                       <div>
-                        <label style={{ display: 'block', fontSize: '12px', color: '#475569', marginBottom: '4px' }}>
+                        <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                           CVV
                         </label>
                         <input
@@ -632,7 +626,9 @@ export default function RazorpayGatewayModal({
                           style={{
                             width: '100%',
                             padding: '10px 12px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid var(--color-border)',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text)',
                             borderRadius: '8px',
                             fontSize: '13.5px',
                             boxSizing: 'border-box',
@@ -642,7 +638,7 @@ export default function RazorpayGatewayModal({
                     </div>
 
                     <div style={{ marginBottom: '18px' }}>
-                      <label style={{ display: 'block', fontSize: '12px', color: '#475569', marginBottom: '4px' }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
                         Cardholder Name
                       </label>
                       <input
@@ -653,7 +649,9 @@ export default function RazorpayGatewayModal({
                         style={{
                           width: '100%',
                           padding: '10px 12px',
-                          border: '1px solid #cbd5e1',
+                          border: '1px solid var(--color-border)',
+                          background: 'var(--color-surface)',
+                          color: 'var(--color-text)',
                           borderRadius: '8px',
                           fontSize: '13.5px',
                           boxSizing: 'border-box',
@@ -666,7 +664,6 @@ export default function RazorpayGatewayModal({
                       className="btn-primary"
                       onClick={() => handleExecutePayment('card')}
                       style={{
-                        background: '#0c2340',
                         width: '100%',
                         padding: '11px',
                         borderRadius: '8px',
@@ -681,10 +678,10 @@ export default function RazorpayGatewayModal({
                 {/* 3. NETBANKING TAB */}
                 {activeMethod === 'netbanking' && (
                   <div>
-                    <span style={{ fontSize: '13px', color: '#64748b', display: 'block', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '13px', color: 'var(--color-text-muted)', display: 'block', marginBottom: '12px' }}>
                       Select your bank:
                     </span>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '18px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginBottom: '18px' }}>
                       {[
                         { code: 'HDFC', name: 'HDFC Bank' },
                         { code: 'SBI', name: 'State Bank of India' },
@@ -699,11 +696,11 @@ export default function RazorpayGatewayModal({
                           onClick={() => setSelectedBank(bank.code)}
                           style={{
                             padding: '12px 10px',
-                            border: selectedBank === bank.code ? '2px solid #0c2340' : '1px solid #e2e8f0',
+                            border: selectedBank === bank.code ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
                             borderRadius: '8px',
-                            background: selectedBank === bank.code ? '#f0fdf4' : '#ffffff',
+                            background: selectedBank === bank.code ? 'var(--color-surface-muted)' : 'var(--color-surface)',
                             fontWeight: selectedBank === bank.code ? 700 : 500,
-                            color: '#0c2340',
+                            color: 'var(--color-text)',
                             fontSize: '13px',
                             cursor: 'pointer',
                             textAlign: 'left',
@@ -719,7 +716,6 @@ export default function RazorpayGatewayModal({
                       className="btn-primary"
                       onClick={() => handleExecutePayment(`netbanking_${selectedBank}`)}
                       style={{
-                        background: '#0c2340',
                         width: '100%',
                         padding: '11px',
                         borderRadius: '8px',
@@ -736,18 +732,18 @@ export default function RazorpayGatewayModal({
             {/* Footer Trust Shield */}
             <div
               style={{
-                background: '#f8fafc',
-                borderTop: '1px solid #e2e8f0',
+                background: 'var(--color-surface-muted)',
+                borderTop: '1px solid var(--color-border)',
                 padding: '12px 24px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 fontSize: '12px',
-                color: '#64748b',
+                color: 'var(--color-text-muted)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Lock size={13} color="#16a34a" />
+                <Lock size={13} style={{ color: 'var(--color-success)' }} />
                 <span>256-bit SSL Encrypted • PCI-DSS Level 1 Compliant</span>
               </div>
               <button
@@ -756,7 +752,7 @@ export default function RazorpayGatewayModal({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#64748b',
+                  color: 'var(--color-text-muted)',
                   fontSize: '12.5px',
                   fontWeight: 600,
                   cursor: 'pointer',

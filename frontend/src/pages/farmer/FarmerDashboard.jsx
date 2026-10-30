@@ -24,19 +24,19 @@ function getDocumentStatusBadge(status, t) {
     case "verified":
       return {
         label: t.documents.statuses.verified,
-        className: "bg-emerald-50 text-emerald-800 border-emerald-200",
+        className: "bg-success-soft text-success-soft-text border-success/30",
         icon: CheckCircle2,
       };
     case "rejected":
       return {
         label: t.documents.statuses.rejected,
-        className: "bg-rose-50 text-rose-800 border-rose-200 font-semibold",
+        className: "bg-danger-soft text-danger-soft-text border-danger/30 font-semibold",
         icon: AlertTriangle,
       };
     default:
       return {
         label: t.documents.statuses.pending,
-        className: "bg-amber-50 text-amber-800 border-amber-200",
+        className: "bg-warning-soft text-warning-soft-text border-warning/30",
         icon: Clock,
       };
   }
@@ -47,27 +47,27 @@ function getRequestStatusBadge(status, t) {
     case "approved":
       return {
         label: t.requestStatuses.approved,
-        className: "bg-emerald-100 text-emerald-800",
+        className: "bg-success-soft text-success-soft-text border border-success/30",
       };
     case "funded":
       return {
         label: t.requestStatuses.funded,
-        className: "bg-teal-100 text-teal-800 font-bold",
+        className: "bg-primary-soft text-primary-soft-text font-bold border border-primary/30",
       };
     case "rejected":
       return {
         label: t.requestStatuses.rejected,
-        className: "bg-rose-100 text-rose-800 font-semibold",
+        className: "bg-danger-soft text-danger-soft-text font-semibold border border-danger/30",
       };
     case "draft":
       return {
         label: t.requestStatuses.draft,
-        className: "bg-slate-100 text-slate-700",
+        className: "bg-surface-muted text-text-muted border border-border",
       };
     default:
       return {
         label: t.requestStatuses.submitted,
-        className: "bg-amber-100 text-amber-800",
+        className: "bg-warning-soft text-warning-soft-text border border-warning/30",
       };
   }
 }
@@ -109,21 +109,21 @@ export default function FarmerDashboard({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center min-h-[300px]" role="status">
-        <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin mb-3" />
-        <p className="text-base text-slate-600">{t.common.loading}</p>
+        <RefreshCw className="w-8 h-8 text-primary animate-spin mb-3" />
+        <p className="text-base text-text-muted">{t.common.loading}</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 m-4 bg-rose-50 border border-rose-200 rounded-2xl text-center" role="alert">
-        <AlertCircle className="w-10 h-10 text-rose-600 mx-auto mb-2" />
-        <p className="text-base font-semibold text-rose-800 mb-4">{error}</p>
+      <div className="p-6 m-4 bg-danger-soft border border-danger/30 rounded-2xl text-center" role="alert">
+        <AlertCircle className="w-10 h-10 text-danger mx-auto mb-2" />
+        <p className="text-base font-semibold text-danger-soft-text mb-4">{error}</p>
         <button
           onClick={loadDashboard}
           type="button"
-          className="inline-flex items-center gap-2 px-5 py-3 bg-rose-600 text-white rounded-xl font-medium min-h-[44px]"
+          className="inline-flex items-center gap-2 px-5 py-3 bg-danger text-danger-foreground rounded-xl font-medium min-h-[44px] cursor-pointer"
         >
           <RefreshCw className="w-5 h-5" />
           <span>{t.common.retry}</span>
@@ -138,24 +138,24 @@ export default function FarmerDashboard({
   const isRejected = farmer.farmerVerificationStatus === "rejected" || hasRejectedDocument;
 
   return (
-    <div className="space-y-6 pb-24 max-w-2xl mx-auto px-4 pt-2">
+    <div className="space-y-6 pb-24 max-w-2xl mx-auto px-4 pt-4">
       {/* Greeting Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
-          <p className="text-sm font-medium text-emerald-700 uppercase tracking-wide">
+          <p className="text-xs sm:text-sm font-bold text-primary uppercase tracking-wide">
             {t.dashboard.greeting}
           </p>
-          <h1 className="text-2xl font-bold text-slate-900 mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text font-serif mt-0.5">
             {farmer.name}
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs sm:text-sm text-text-muted mt-0.5">
             {farmer.village ? `${farmer.village}, ${farmer.district}` : farmer.phone}
           </p>
         </div>
         <button
           onClick={() => onNavigateTab("profile")}
           type="button"
-          className="p-3 text-slate-600 hover:text-emerald-700 bg-slate-50 hover:bg-emerald-50 rounded-full border border-slate-200 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
+          className="p-3 text-text-muted hover:text-primary bg-surface hover:bg-surface-muted rounded-2xl border border-border min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors cursor-pointer"
           aria-label="View Profile"
         >
           <User className="w-5 h-5" />
@@ -165,31 +165,31 @@ export default function FarmerDashboard({
       {/* 1. Verification Status Banner */}
       <section aria-labelledby="verification-banner-title">
         {isVerified ? (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3.5">
-            <ShieldCheck className="w-7 h-7 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-success-soft border border-success/30 rounded-2xl flex items-start gap-3.5">
+            <ShieldCheck className="w-7 h-7 text-success shrink-0 mt-0.5" />
             <div>
-              <h2 id="verification-banner-title" className="text-base font-bold text-emerald-900">
+              <h2 id="verification-banner-title" className="text-base font-bold text-success-soft-text">
                 {t.verification.verifiedTitle}
               </h2>
-              <p className="text-sm text-emerald-800 mt-0.5 leading-relaxed">
+              <p className="text-sm text-success-soft-text/90 mt-0.5 leading-relaxed">
                 {t.verification.verifiedDesc}
               </p>
             </div>
           </div>
         ) : isRejected ? (
-          <div className="p-4 bg-rose-50 border border-rose-300 rounded-2xl flex items-start gap-3.5">
-            <ShieldAlert className="w-7 h-7 text-rose-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-danger-soft border border-danger/30 rounded-2xl flex items-start gap-3.5">
+            <ShieldAlert className="w-7 h-7 text-danger shrink-0 mt-0.5" />
             <div>
-              <h2 id="verification-banner-title" className="text-base font-bold text-rose-900">
+              <h2 id="verification-banner-title" className="text-base font-bold text-danger-soft-text">
                 {t.verification.rejectedTitle}
               </h2>
-              <p className="text-sm text-rose-800 mt-0.5 leading-relaxed">
+              <p className="text-sm text-danger-soft-text/90 mt-0.5 leading-relaxed">
                 {farmer.verificationRemarks || t.verification.rejectedDesc}
               </p>
               <button
                 onClick={() => onNavigateTab("documents")}
                 type="button"
-                className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-xl text-sm font-semibold shadow-sm min-h-[44px]"
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-danger text-danger-foreground rounded-xl text-sm font-semibold shadow-xs min-h-[44px] cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>{t.dashboard.fixRejectedDocs}</span>
@@ -197,15 +197,15 @@ export default function FarmerDashboard({
             </div>
           </div>
         ) : (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3.5">
-            <Clock className="w-7 h-7 text-amber-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-warning-soft border border-warning/30 rounded-2xl flex items-start gap-3.5">
+            <Clock className="w-7 h-7 text-warning shrink-0 mt-0.5" />
             <div>
-              <h2 id="verification-banner-title" className="text-base font-bold text-amber-900">
+              <h2 id="verification-banner-title" className="text-base font-bold text-warning-soft-text">
                 {farmer.farmerVerificationStatus === "under_review"
                   ? t.verification.underReviewTitle
                   : t.verification.pendingTitle}
               </h2>
-              <p className="text-sm text-amber-800 mt-0.5 leading-relaxed">
+              <p className="text-sm text-warning-soft-text/90 mt-0.5 leading-relaxed">
                 {farmer.farmerVerificationStatus === "under_review"
                   ? t.verification.underReviewDesc
                   : t.verification.pendingDesc}
@@ -217,16 +217,16 @@ export default function FarmerDashboard({
 
       {/* 2. Document Status Chips */}
       {documents && documents.length > 0 && (
-        <section aria-labelledby="doc-chips-heading" className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+        <section aria-labelledby="doc-chips-heading" className="bg-surface p-5 rounded-2xl border border-border shadow-xs">
           <div className="flex items-center justify-between mb-3">
-            <h3 id="doc-chips-heading" className="text-sm font-bold text-slate-800 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-emerald-600" />
+            <h3 id="doc-chips-heading" className="text-sm font-bold text-text flex items-center gap-2">
+              <FileText className="w-4 h-4 text-primary" />
               <span>{t.dashboard.documentStatusTitle}</span>
             </h3>
             <button
               onClick={() => onNavigateTab("documents")}
               type="button"
-              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 min-h-[44px]"
+              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 min-h-[44px] cursor-pointer"
             >
               <span>{t.nav.documents}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -241,7 +241,7 @@ export default function FarmerDashboard({
               return (
                 <div
                   key={doc.id}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium ${badge.className}`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${badge.className}`}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span>{typeName}: {badge.label}</span>
@@ -251,13 +251,13 @@ export default function FarmerDashboard({
           </div>
 
           {hasRejectedDocument && (
-            <div className="mt-3 pt-3 border-t border-slate-100">
+            <div className="mt-3 pt-3 border-t border-border">
               <button
                 onClick={() => onNavigateTab("documents")}
                 type="button"
-                className="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 min-h-[44px] transition-colors"
+                className="w-full py-2.5 px-4 bg-danger-soft hover:bg-danger-soft/80 text-danger-soft-text border border-danger/30 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 min-h-[44px] transition-colors cursor-pointer"
               >
-                <AlertTriangle className="w-4 h-4" />
+                <AlertTriangle className="w-4 h-4 text-danger" />
                 <span>{t.dashboard.fixRejectedDocs}</span>
               </button>
             </div>
@@ -267,10 +267,10 @@ export default function FarmerDashboard({
 
       {/* 3. Primary CTA: One very large "Request help" button */}
       <section aria-label="Request Assistance Action">
-        <div className="bg-linear-to-br from-emerald-50 via-teal-50 to-green-100 p-5 rounded-3xl border border-emerald-200 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <HandHeart className="w-5 h-5 text-emerald-700" />
-            <h2 className="text-base font-bold text-emerald-950">
+        <div className="bg-surface p-5 sm:p-6 rounded-3xl border-2 border-primary/30 shadow-xs">
+          <div className="flex items-center gap-2 mb-3">
+            <HandHeart className="w-5 h-5 text-primary" />
+            <h2 className="text-base font-bold text-text">
               {t.dashboard.quickActionTitle}
             </h2>
           </div>
@@ -279,19 +279,19 @@ export default function FarmerDashboard({
             onClick={() => onNavigateTab("new-request")}
             disabled={!canRequestHelp}
             type="button"
-            className={`w-full py-4 px-6 rounded-2xl font-bold text-base shadow-md flex items-center justify-center gap-3 transition-all min-h-[56px] ${
+            className={`w-full py-4 px-6 rounded-2xl font-bold text-lg shadow-md flex items-center justify-center gap-3 transition-all min-h-[58px] ${
               canRequestHelp
-                ? "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer active:scale-98"
-                : "bg-slate-200 text-slate-500 cursor-not-allowed shadow-none border border-slate-300"
+                ? "bg-primary hover:bg-primary-hover text-primary-foreground cursor-pointer active:scale-98"
+                : "bg-surface-muted text-text-muted cursor-not-allowed shadow-none border border-border opacity-70"
             }`}
           >
-            <PlusCircle className="w-6 h-6" />
+            <PlusCircle className="w-6 h-6 shrink-0" />
             <span>{t.dashboard.requestHelpButton}</span>
           </button>
 
           {!canRequestHelp && (
-            <div className="mt-3 flex items-start gap-2 text-xs font-medium text-amber-900 bg-amber-50 p-3 rounded-xl border border-amber-200">
-              <HelpCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+            <div className="mt-3 flex items-start gap-2 text-xs font-medium text-warning-soft-text bg-warning-soft p-3.5 rounded-xl border border-warning/30">
+              <HelpCircle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
               <p>{cannotRequestReason || t.dashboard.requestHelpDisabled}</p>
             </div>
           )}
@@ -301,14 +301,14 @@ export default function FarmerDashboard({
       {/* 4. Active Draft Notice (if farmer has an unfinished draft) */}
       {activeDraft && (
         <section aria-label="Active Draft Reminder">
-          <div className="p-4 bg-sky-50 border border-sky-200 rounded-2xl flex items-center justify-between gap-3">
+          <div className="p-4 bg-info-soft border border-info/30 rounded-2xl flex items-center justify-between gap-3">
             <div className="flex items-start gap-3">
-              <FileText className="w-6 h-6 text-sky-600 shrink-0 mt-0.5" />
+              <FileText className="w-6 h-6 text-info shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-sm font-bold text-sky-950">
+                <h3 className="text-sm font-bold text-info-soft-text">
                   {t.dashboard.draftBannerTitle}
                 </h3>
-                <p className="text-xs text-sky-800 mt-0.5">
+                <p className="text-xs text-info-soft-text/80 mt-0.5">
                   {activeDraft.category ? `${t.categories[activeDraft.category] || activeDraft.category} • ` : ""}
                   {activeDraft.amountRequested ? `₹${activeDraft.amountRequested.toLocaleString("en-IN")}` : t.dashboard.draftBannerDesc}
                 </p>
@@ -317,7 +317,7 @@ export default function FarmerDashboard({
             <button
               onClick={() => onResumeDraft ? onResumeDraft(activeDraft) : onNavigateTab("new-request")}
               type="button"
-              className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shrink-0 min-h-[44px] flex items-center gap-1 shadow-xs"
+              className="px-4 py-2 bg-info text-info-foreground hover:opacity-90 rounded-xl text-xs font-bold shrink-0 min-h-[44px] flex items-center gap-1 shadow-xs cursor-pointer"
             >
               <span>{t.dashboard.continueDraft}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -329,15 +329,15 @@ export default function FarmerDashboard({
       {/* 5. Recent Requests with Funding Progress Bars */}
       <section aria-labelledby="recent-requests-heading">
         <div className="flex items-center justify-between mb-3">
-          <h2 id="recent-requests-heading" className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
+          <h2 id="recent-requests-heading" className="text-lg font-bold text-text flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
             <span>{t.dashboard.recentTitle}</span>
           </h2>
           {recentRequests && recentRequests.length > 0 && (
             <button
               onClick={() => onNavigateTab("requests")}
               type="button"
-              className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 min-h-[44px]"
+              className="text-sm font-semibold text-primary hover:underline flex items-center gap-1 min-h-[44px] cursor-pointer"
             >
               <span>{t.dashboard.viewAll}</span>
               <ArrowRight className="w-4 h-4" />
@@ -346,12 +346,12 @@ export default function FarmerDashboard({
         </div>
 
         {!recentRequests || recentRequests.length === 0 ? (
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-            <HandHeart className="w-10 h-10 text-slate-400 mx-auto mb-2" />
-            <p className="text-base font-semibold text-slate-800">
+          <div className="p-8 bg-surface border border-dashed border-border rounded-2xl text-center">
+            <HandHeart className="w-10 h-10 text-text-muted/60 mx-auto mb-2" />
+            <p className="text-base font-semibold text-text">
               {t.dashboard.noRequestsYet}
             </p>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
+            <p className="text-xs text-text-muted mt-1 max-w-sm mx-auto leading-relaxed">
               {t.dashboard.noRequestsSubtext}
             </p>
           </div>
@@ -373,14 +373,14 @@ export default function FarmerDashboard({
                   }}
                   role="button"
                   tabIndex={0}
-                  className="p-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl shadow-xs transition-colors cursor-pointer text-left focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                  className="p-4 sm:p-5 bg-surface hover:bg-surface-muted/60 border border-border rounded-2xl shadow-xs transition-colors cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">
+                      <h3 className="text-base font-bold text-text">
                         {categoryTitle}
                       </h3>
-                      <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
+                      <p className="text-xs text-text-muted line-clamp-1 mt-0.5">
                         {req.purpose || "Assistance request"}
                       </p>
                     </div>
@@ -391,19 +391,19 @@ export default function FarmerDashboard({
 
                   {/* Funding Progress Bar */}
                   <div className="mt-3">
-                    <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                      <span className="text-emerald-700">
+                    <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
+                      <span className="text-primary font-bold">
                         ₹{(req.amountFunded || 0).toLocaleString("en-IN")} {t.dashboard.raisedOf} ₹{(req.amountRequested || 0).toLocaleString("en-IN")}
                       </span>
-                      <span className="text-slate-600 font-bold">
+                      <span className="text-text-muted font-bold">
                         {req.fundingPercentage || 0}%
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                    <div className="w-full bg-surface-muted rounded-full h-2.5 overflow-hidden border border-border/40">
                       <div
                         className={`h-2.5 rounded-full transition-all duration-500 ${
-                          isFunded ? "bg-teal-500" : "bg-emerald-600"
+                          isFunded ? "bg-accent" : "bg-primary"
                         }`}
                         style={{ width: `${Math.min(100, req.fundingPercentage || 0)}%` }}
                       />
@@ -411,17 +411,17 @@ export default function FarmerDashboard({
                   </div>
 
                   {/* Donor count badge */}
-                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-text-muted">
                     <div className="flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-slate-400" />
+                      <Users className="w-3.5 h-3.5 text-text-muted" />
                       <span>
                         {req.donorCount === 1
                           ? t.dashboard.singleDonor
                           : t.dashboard.donorsCount.replace("{count}", req.donorCount || 0)}
                       </span>
                     </div>
-                    <div className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                      <span>View</span>
+                    <div className="text-primary font-bold flex items-center gap-0.5">
+                      <span>View details</span>
                       <ArrowRight className="w-3 h-3" />
                     </div>
                   </div>
