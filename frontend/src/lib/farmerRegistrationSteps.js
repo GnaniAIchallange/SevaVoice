@@ -22,6 +22,17 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     documentListening: "ऐकत आहे...",
     retry: "मला उत्तर समजले नाही. कृपया पुन्हा सांगा किंवा टाइप करा.",
     confirmPrefix: "तुम्ही सांगितले",
+    confirmation: {
+      isCorrectPrompt: "हे बरोबर आहे का? कृपया हो किंवा नाही म्हणा.",
+      confirmQuestionText: "हे उत्तर बरोबर आहे का?",
+      listeningYesNo: "हो किंवा नाही ऐकत आहे...",
+      confirmedNotice: "उत्तर पुष्टी झाले ✓",
+      retryNotice: "ठीक आहे. आपण पुन्हा विचारत आहोत...",
+      unclearNotice: "मला समजले नाही. कृपया होय किंवा नाही म्हणा.",
+      yesLabel: "होय, बरोबर आहे",
+      noLabel: "नाही, पुन्हा सांगा",
+      hearAgain: "पुन्हा ऐका",
+    },
     done: "तुमची माहिती जतन झाली आहे.",
     duplicatePhone: "हा मोबाईल क्रमांक आधीच नोंदणीकृत आहे.",
     invalidDetails: "कृपया माहिती तपासा आणि पुन्हा प्रयत्न करा.",
@@ -77,6 +88,17 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     documentListening: "सुन रहा है...",
     retry: "मुझे जवाब समझ नहीं आया। कृपया फिर से बोलें या टाइप करें।",
     confirmPrefix: "आपने कहा",
+    confirmation: {
+      isCorrectPrompt: "क्या यह सही है? कृपया हाँ या नहीं कहें।",
+      confirmQuestionText: "क्या यह उत्तर सही है?",
+      listeningYesNo: "हाँ या नहीं सुन रहा है...",
+      confirmedNotice: "उत्तर की पुष्टि हो गई ✓",
+      retryNotice: "ठीक है। हम दोबारा पूछ रहे हैं...",
+      unclearNotice: "मुझे समझ नहीं आया। कृपया हाँ या नहीं कहें।",
+      yesLabel: "हाँ, सही है",
+      noLabel: "नहीं, दोबारा बताएं",
+      hearAgain: "दोबारा सुनें",
+    },
     done: "आपकी जानकारी सहेज ली गई है।",
     duplicatePhone: "यह मोबाइल नंबर पहले से पंजीकृत है।",
     invalidDetails: "कृपया जानकारी जाँचकर फिर कोशिश करें।",
@@ -132,6 +154,17 @@ export const FARMER_REGISTRATION_LANGUAGES = {
     documentListening: "Listening...",
     retry: "I could not understand that. Please say it again or type your answer.",
     confirmPrefix: "You said",
+    confirmation: {
+      isCorrectPrompt: "Is this correct? Please say Yes or No.",
+      confirmQuestionText: "Is this answer correct?",
+      listeningYesNo: "Listening for Yes or No...",
+      confirmedNotice: "Answer confirmed ✓",
+      retryNotice: "Okay, let's ask again...",
+      unclearNotice: "I did not understand. Please say Yes or No.",
+      yesLabel: "Yes, Correct",
+      noLabel: "No, Try Again",
+      hearAgain: "Hear Again",
+    },
     done: "Your details are saved.",
     duplicatePhone: "This mobile number is already registered.",
     invalidDetails: "Check your details and try again.",
@@ -568,4 +601,39 @@ export function phoneReadback(value, language) {
   return Array.from(normalize("phone", value))
     .map((digit) => digitWords[language][Number(digit)])
     .join(" ");
+}
+
+export function parseConfirmationResponse(transcript, language = "en-IN") {
+  if (!transcript || typeof transcript !== "string") return null;
+  const cleaned = transcript
+    .toLowerCase()
+    .trim()
+    .replace(/[.,?!:;।\-]/g, " ")
+    .replace(/\s+/g, " ");
+
+  const NO_PATTERNS = [
+    /\b(नाही|नाही नाही|चूक|चुकीचे|नाही चूक|बदला|नाही बदला|नको)\b/i,
+    /\b(नहीं|ना|गलत|गलत है|नहीं नहीं|बदलो|नहीं जी|मत|नाजी)\b/i,
+    /\b(no|nope|wrong|incorrect|not right|change|nahi|nahin|galat|chuk)\b/i,
+  ];
+
+  const YES_PATTERNS = [
+    /\b(हो|होय|बरोबर|बरोबर आहे|हो बरोबर|होय बरोबर|नक्की|चालतंय|होय हो|हो हो|खरे|सत्य|योग्य)\b/i,
+    /\b(हाँ|हाँ जी|हां|हाँ ठीक है|सही|सही है|हाँ सही|बिलकुल|ठीक है|जी हाँ|जी हां|अवश्य|हाँजी)\b/i,
+    /\b(yes|yeah|yep|yup|correct|right|sure|ok|okay|ha|haa|haan|sahi|barobar|theek)\b/i,
+  ];
+
+  for (const pattern of NO_PATTERNS) {
+    if (pattern.test(cleaned)) {
+      return "no";
+    }
+  }
+
+  for (const pattern of YES_PATTERNS) {
+    if (pattern.test(cleaned)) {
+      return "yes";
+    }
+  }
+
+  return null;
 }

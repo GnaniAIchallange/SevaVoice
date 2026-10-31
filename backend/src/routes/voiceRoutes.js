@@ -69,7 +69,7 @@ export function createVoiceRouter({
   service = createVoiceService({ apiKey: env.GNANI_API_KEY }),
   limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 30,
+    limit: 300,
     standardHeaders: true,
     legacyHeaders: false,
     handler: (_req, res) =>

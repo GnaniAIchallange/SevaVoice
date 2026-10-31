@@ -35,16 +35,13 @@ function speakWithBrowserSynthesis(text, language) {
 
       utterance.onend = () => resolve();
       utterance.onerror = (e) => {
-        if (e.error === "canceled" || e.error === "interrupted") {
-          resolve();
-        } else {
-          reject(e);
-        }
+        // Resolve safely on synthesis errors or cancellations to prevent crashing caller flows
+        resolve();
       };
 
       window.speechSynthesis.speak(utterance);
-    } catch (err) {
-      reject(err);
+    } catch {
+      resolve();
     }
   });
 }
@@ -265,12 +262,35 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
         audioElement.currentTime = 0;
         await waitForPlayback(audioElement);
       } catch (err) {
-        if (err.name === "AbortError") throw err;
-        // If HTML5 audio playback fails (e.g. autoplay restriction), fallback to browser speech synthesis
+        if (err.name === "AbortError" || err.name === "NotAllowedError") throw err;
+        // If HTML5 audio playback fails (other error), fallback to browser speech synthesis
         await speakWithBrowserSynthesis(cleanText, normLang);
       }
     } else {
       await speakWithBrowserSynthesis(cleanText, normLang);
+    }
+  }
+
+  async function preload(language, text) {
+    if (disposed) return;
+    const cleanText = (text || "").trim().slice(0, 300);
+    if (!cleanText) return;
+    const normLang = normalizeVoiceLanguage(language);
+    const key = JSON.stringify([normLang, cleanText]);
+    if (audioUrls.has(key)) return;
+
+    try {
+      const response = await fetchImpl(`${API_URL}/api/voice/tts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: cleanText, language: normLang }),
+      });
+      if (response.ok && !disposed) {
+        const blob = await response.blob();
+        audioUrls.set(key, URL.createObjectURL(new Blob([blob], { type: "audio/wav" })));
+      }
+    } catch {
+      // Ignore background preload errors
     }
   }
 
@@ -297,5 +317,5 @@ export function createVoiceApi({ fetchImpl = fetch } = {}) {
     }
   }
 
-  return { transcribe, speak, stop, dispose };
+  return { transcribe, speak, preload, stop, dispose };
 }

@@ -4,11 +4,14 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  CheckCircle,
+  Languages,
   Loader2,
   Map,
   MapPin,
   Mic,
   Phone,
+  RotateCcw,
   Ruler,
   Sprout,
   Square,
@@ -16,7 +19,7 @@ import {
   Volume2,
   VolumeX,
   Wheat,
-  Languages,
+  XCircle,
 } from "lucide-react";
 import RouteLink from "../../components/RouteLink.jsx";
 import {
@@ -24,6 +27,7 @@ import {
   FARMER_REGISTRATION_LANGUAGES,
   getFarmerValidationMessage,
   normalize,
+  parseConfirmationResponse,
   phoneDigitCount,
   phoneReadback,
   validateFarmerAnswer,
@@ -60,6 +64,7 @@ function RegisterFarmer({ onNavigate }) {
   const [status, setStatus] = useState("");
   const [answerSource, setAnswerSource] = useState(null);
   const [validationErrorCode, setValidationErrorCode] = useState(null);
+  const [confirmState, setConfirmState] = useState("idle");
   const [voiceGuideEnabled, setVoiceGuideEnabled] = useState(loadVoicePreference);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documentFiles, setDocumentFiles] = useState({
@@ -254,10 +259,20 @@ function RegisterFarmer({ onNavigate }) {
       setValue(transcript);
       setAnswerSource("voice");
       setStatus("");
+
+      const validationError = validateFarmerAnswer(field, transcript);
+      if (validationError) {
+        setValidationErrorCode(validationError);
+        changePhase("ready");
+        if (lastSpokenErrorRef.current !== validationError) {
+          lastSpokenErrorRef.current = validationError;
+          await speakValidationError(validationError);
+        }
+        return;
+      }
+
       changePhase("ready");
-      const spokenAnswer =
-        field === "phone" ? phoneReadback(transcript, language) : transcript;
-      await playSpeech(`${languageConfig.confirmPrefix}: ${spokenAnswer}`);
+      await runAnswerConfirmation(transcript, operation);
     } catch (error) {
       if (!mountedRef.current || operationRef.current !== operation) {
         return;
@@ -285,8 +300,205 @@ function RegisterFarmer({ onNavigate }) {
     }
   }
 
+  async function runAnswerConfirmation(answerToConfirm, operation) {
+    if (!mountedRef.current || operationRef.current !== operation || !languageConfig) {
+      return;
+    }
+
+    setConfirmState("reading");
+    const spokenAnswer =
+      field === "phone" ? phoneReadback(answerToConfirm, language) : answerToConfirm;
+
+    // Read the recognized answer back to the farmer, then ask if it is correct
+    const confirmPrompt = `${languageConfig.confirmPrefix}: ${spokenAnswer}. ${languageConfig.confirmation.isCorrectPrompt}`;
+
+    try {
+      await playSpeech(confirmPrompt);
+    } catch {
+      // Abort or cancelled
+    }
+
+    if (!mountedRef.current || operationRef.current !== operation) {
+      return;
+    }
+
+    // Now start listening for Yes / No confirmation
+    await listenForConfirmationResponse(operation);
+  }
+
+  async function listenForConfirmationResponse(operation) {
+    if (!mountedRef.current || operationRef.current !== operation || !languageConfig) {
+      return;
+    }
+
+    setConfirmState("listening");
+
+    // Only start voice recording for confirmation if voice guide is enabled
+    if (!voiceGuideRef.current) {
+      return;
+    }
+
+    const confirmRecorder = createVoiceRecorder({
+      maxDurationMs: 10000,
+      onRecordingChange(isRecording) {
+        if (mountedRef.current && operationRef.current === operation && isRecording) {
+          setConfirmState("listening");
+        }
+      },
+    });
+    recorderRef.current = confirmRecorder;
+
+    try {
+      const audio = await confirmRecorder.start();
+      if (!mountedRef.current || operationRef.current !== operation) {
+        return;
+      }
+
+      recorderRef.current = null;
+      setConfirmState("processing");
+
+      const transcript = await voiceApi.transcribe(audio, language);
+      if (!mountedRef.current || operationRef.current !== operation) {
+        return;
+      }
+
+      const decision = parseConfirmationResponse(transcript, language);
+
+      if (decision === "yes") {
+        await handleConfirmYes(operation);
+      } else if (decision === "no") {
+        await handleConfirmNo(operation);
+      } else {
+        // Unclear response: speak clarification notice and remain in listening state
+        if (mountedRef.current && operationRef.current === operation) {
+          setConfirmState("listening");
+          await playSpeech(languageConfig.confirmation.unclearNotice);
+        }
+      }
+    } catch (error) {
+      if (!mountedRef.current || operationRef.current !== operation) {
+        return;
+      }
+      recorderRef.current = null;
+      if (error.name !== "AbortError") {
+        setConfirmState("listening");
+      }
+    } finally {
+      if (operationRef.current === operation) {
+        recorderRef.current = null;
+      }
+    }
+  }
+
+  async function handleConfirmYes(passedOperation) {
+    if (!language || advanceLockRef.current || isSubmitting) {
+      return;
+    }
+
+    advanceLockRef.current = true;
+    const operation = passedOperation ?? (operationRef.current + 1);
+    if (!passedOperation) {
+      operationRef.current = operation;
+    }
+
+    recorderRef.current?.cancel();
+    recorderRef.current = null;
+    voiceApi.stop(audioRef.current);
+
+    const validationError = validateFarmerAnswer(field, value);
+    if (validationError) {
+      setValidationErrorCode(validationError);
+      setConfirmState("idle");
+      advanceLockRef.current = false;
+      await speakValidationError(validationError);
+      return;
+    }
+
+    setConfirmState("confirmed");
+    setStatus(languageConfig.confirmation.confirmedNotice);
+
+    const normalized = normalize(field, value);
+    const completedAnswers = { ...answers, [field]: normalized };
+    setAnswers(completedAnswers);
+    setValidationErrorCode(null);
+    setAnswerSource(null);
+    setValue("");
+
+    if (stepIndex === FARMER_REGISTRATION_FIELDS.length - 1) {
+      changePhase("documents");
+      setConfirmState("idle");
+      void speakDocumentGuide(true);
+      advanceLockRef.current = false;
+      return;
+    }
+
+    const nextIndex = stepIndex + 1;
+    setStepIndex(nextIndex);
+    changePhase("speaking");
+    setConfirmState("idle");
+    setStatus("");
+
+    try {
+      await playSpeech(
+        languageConfig.steps[FARMER_REGISTRATION_FIELDS[nextIndex]].prompt,
+      );
+    } finally {
+      if (mountedRef.current && operationRef.current === operation) {
+        changePhase("ready");
+      }
+      advanceLockRef.current = false;
+    }
+  }
+
+  async function handleConfirmNo(passedOperation) {
+    if (!language || isSubmitting) {
+      return;
+    }
+
+    const operation = passedOperation ?? (operationRef.current + 1);
+    if (!passedOperation) {
+      operationRef.current = operation;
+    }
+
+    recorderRef.current?.cancel();
+    recorderRef.current = null;
+    voiceApi.stop(audioRef.current);
+
+    setValue("");
+    setAnswerSource(null);
+    setValidationErrorCode(null);
+    setConfirmState("rejected");
+    setStatus(languageConfig.confirmation.retryNotice);
+
+    changePhase("speaking");
+    try {
+      const retryMessage = `${languageConfig.confirmation.retryNotice} ${step.prompt}`;
+      await playSpeech(retryMessage);
+    } finally {
+      if (mountedRef.current && operationRef.current === operation) {
+        setConfirmState("idle");
+        changePhase("ready");
+        setStatus("");
+        if (voiceGuideRef.current) {
+          void startRecording();
+        }
+      }
+    }
+  }
+
+  async function handleReplayConfirmation() {
+    if (!value || !languageConfig) return;
+    const operation = operationRef.current + 1;
+    operationRef.current = operation;
+    recorderRef.current?.cancel();
+    recorderRef.current = null;
+    voiceApi.stop(audioRef.current);
+
+    await runAnswerConfirmation(value, operation);
+  }
+
   function handleMicrophone() {
-    if (phaseRef.current === "recording") {
+    if (phaseRef.current === "recording" || confirmState === "listening") {
       recorderRef.current?.stop();
       return;
     }
@@ -299,6 +511,7 @@ function RegisterFarmer({ onNavigate }) {
     setValidationErrorCode(null);
     lastSpokenErrorRef.current = null;
     setStatus("");
+    setConfirmState("idle");
   }
 
   async function speakValidationError(code) {
@@ -325,6 +538,7 @@ function RegisterFarmer({ onNavigate }) {
     setAnswerSource("typed");
     setValidationErrorCode(code);
     setStatus("");
+    setConfirmState("idle");
     changePhase("ready");
     lastSpokenErrorRef.current = code;
     void speakValidationError(code);
@@ -332,54 +546,7 @@ function RegisterFarmer({ onNavigate }) {
   }
 
   async function proceedToNextStep() {
-    if (!language || advanceLockRef.current || isSubmitting) {
-      return;
-    }
-
-    advanceLockRef.current = true;
-    const operation = operationRef.current + 1;
-    operationRef.current = operation;
-    voiceApi.stop(audioRef.current);
-    setStatus("");
-
-    const validationError = validateFarmerAnswer(field, value);
-    if (validationError) {
-      setValidationErrorCode(validationError);
-      if (lastSpokenErrorRef.current !== validationError) {
-        lastSpokenErrorRef.current = validationError;
-        await speakValidationError(validationError);
-      }
-      advanceLockRef.current = false;
-      return;
-    }
-
-    const normalized = normalize(field, value);
-    const completedAnswers = { ...answers, [field]: normalized };
-    setAnswers(completedAnswers);
-    setValidationErrorCode(null);
-    setAnswerSource(null);
-    setValue("");
-
-    if (stepIndex === FARMER_REGISTRATION_FIELDS.length - 1) {
-      changePhase("documents");
-      void speakDocumentGuide(true);
-      advanceLockRef.current = false;
-      return;
-    }
-
-    const nextIndex = stepIndex + 1;
-    setStepIndex(nextIndex);
-    changePhase("speaking");
-    try {
-      await playSpeech(
-        languageConfig.steps[FARMER_REGISTRATION_FIELDS[nextIndex]].prompt,
-      );
-    } finally {
-      if (mountedRef.current && operationRef.current === operation) {
-        changePhase("ready");
-      }
-      advanceLockRef.current = false;
-    }
+    await handleConfirmYes();
   }
 
   async function speakDocumentGuide(automatic = false) {
@@ -997,36 +1164,123 @@ function RegisterFarmer({ onNavigate }) {
             </p>
           )}
 
-          {answerSource === "voice" && value && (
-            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-info/40 bg-info-soft p-4">
-              <p
-                className="flex min-h-12 flex-1 items-center gap-2 font-semibold text-info-soft-text"
-                data-testid="voice-confirmation"
-              >
-                <Check aria-hidden="true" size={22} className="text-info shrink-0" />
-                <span>{actions.checkHeard}: <strong className="break-all">{value}</strong></span>
-              </p>
-              <button
-                aria-label={actions.listen}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-info/40 bg-surface/50 px-3 py-2 font-bold text-info-soft-text hover:bg-surface cursor-pointer"
-                onClick={() => {
-                  const spoken =
-                    field === "phone" ? phoneReadback(value, language) : value;
-                  listenTo(`${languageConfig.confirmPrefix}: ${spoken}`);
-                }}
-                type="button"
-              >
-                <Volume2 aria-hidden="true" size={20} />
-                <span>{actions.listen}</span>
-              </button>
-              <button
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-info/40 bg-surface/50 px-3 py-2 font-bold text-info-soft-text hover:bg-surface cursor-pointer"
-                onClick={handleMicrophone}
-                type="button"
-              >
-                <Mic aria-hidden="true" size={20} />
-                <span>{actions.speakAgain}</span>
-              </button>
+          {/* Voice Answer Confirmation Card */}
+          {(confirmState !== "idle" || (value && !validationMessage)) && (
+            <div
+              className="mt-6 rounded-3xl border-2 border-primary/30 bg-primary-soft/20 p-5 sm:p-7 shadow-sm transition-all"
+              data-testid="voice-confirmation"
+            >
+              {/* Status Header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-border/60">
+                <div className="flex items-center gap-2 font-bold text-sm sm:text-base">
+                  {confirmState === "reading" ? (
+                    <span className="flex items-center gap-2 text-primary font-extrabold animate-pulse">
+                      <Volume2 size={20} />
+                      <span>{actions.checkHeard}...</span>
+                    </span>
+                  ) : confirmState === "listening" ? (
+                    <span className="flex items-center gap-2 text-danger font-extrabold animate-pulse">
+                      <Mic size={20} className="text-danger animate-bounce" />
+                      <span>{languageConfig.confirmation.listeningYesNo}</span>
+                    </span>
+                  ) : confirmState === "processing" ? (
+                    <span className="flex items-center gap-2 text-primary font-bold">
+                      <Loader2 size={20} className="animate-spin text-primary" />
+                      <span>Processing confirmation...</span>
+                    </span>
+                  ) : confirmState === "confirmed" ? (
+                    <span className="flex items-center gap-2 text-emerald-600 font-extrabold">
+                      <CheckCircle size={20} />
+                      <span>{languageConfig.confirmation.confirmedNotice}</span>
+                    </span>
+                  ) : confirmState === "rejected" ? (
+                    <span className="flex items-center gap-2 text-danger font-bold">
+                      <XCircle size={20} />
+                      <span>{languageConfig.confirmation.retryNotice}</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2 text-text font-bold">
+                      <Check size={20} className="text-primary" />
+                      <span>{actions.checkHeard}:</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Hear Again button */}
+                <button
+                  type="button"
+                  onClick={handleReplayConfirmation}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface text-xs font-bold text-text hover:text-primary hover:border-primary transition-colors cursor-pointer"
+                  title={languageConfig.confirmation.hearAgain}
+                >
+                  <RotateCcw size={16} />
+                  <span>{languageConfig.confirmation.hearAgain}</span>
+                </button>
+              </div>
+
+              {/* Spoken Answer Display & Confirmation Question */}
+              <div className="mb-5 text-center sm:text-left">
+                <p className="text-xs uppercase tracking-wider font-extrabold text-text-muted mb-1">
+                  {step.label}
+                </p>
+                <div className="text-2xl sm:text-3xl font-extrabold text-text break-words font-serif">
+                  {value}
+                </div>
+                <p className="mt-2 text-base sm:text-lg font-bold text-primary">
+                  {languageConfig.confirmation.confirmQuestionText}
+                </p>
+              </div>
+
+              {/* Two Large YES / NO Touch-Friendly Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                {/* YES Button */}
+                <button
+                  type="button"
+                  onClick={() => void handleConfirmYes()}
+                  disabled={isSubmitting || confirmState === "confirmed"}
+                  className="group min-h-16 p-4 rounded-2xl bg-primary text-primary-foreground hover:bg-primary-hover shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-3 active:scale-[0.99] cursor-pointer border-2 border-primary"
+                >
+                  <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                    <CheckCircle size={24} />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-extrabold text-lg sm:text-xl leading-tight">
+                      {languageConfig.confirmation.yesLabel}
+                    </div>
+                    <div className="text-xs font-semibold text-primary-foreground/80">
+                      होय म्हणा किंवा टॅप करा (Say Yes)
+                    </div>
+                  </div>
+                </button>
+
+                {/* NO Button */}
+                <button
+                  type="button"
+                  onClick={() => void handleConfirmNo()}
+                  disabled={isSubmitting || confirmState === "rejected"}
+                  className="group min-h-16 p-4 rounded-2xl bg-surface hover:bg-surface-muted text-text hover:text-danger border-2 border-border hover:border-danger/60 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 active:scale-[0.99] cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-full bg-surface-muted flex items-center justify-center text-text-muted group-hover:text-danger group-hover:scale-110 transition-all">
+                    <XCircle size={24} />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-extrabold text-lg sm:text-xl leading-tight text-text group-hover:text-danger transition-colors">
+                      {languageConfig.confirmation.noLabel}
+                    </div>
+                    <div className="text-xs font-semibold text-text-muted">
+                      नाही म्हणा किंवा टॅप करा (Say No)
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Live Mic Listening indicator banner during voice confirmation */}
+              {confirmState === "listening" && (
+                <div className="mt-4 p-3 rounded-xl bg-danger-soft/40 border border-danger/30 text-center text-xs sm:text-sm font-bold text-danger flex items-center justify-center gap-2 animate-pulse">
+                  <Mic size={18} className="animate-bounce text-danger" />
+                  <span>{languageConfig.confirmation.listeningYesNo}</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -1067,16 +1321,6 @@ function RegisterFarmer({ onNavigate }) {
               </button>
             </div>
           )}
-
-          <button
-            className="mt-6 inline-flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-primary text-primary-foreground hover:bg-primary-hover px-5 py-4 text-xl font-extrabold disabled:cursor-not-allowed disabled:opacity-50 transition-all cursor-pointer shadow-md active:scale-[0.99]"
-            disabled={isSubmitting}
-            onClick={() => void proceedToNextStep()}
-            type="button"
-          >
-            <span>{actions.proceed}</span>
-            <ArrowRight aria-hidden="true" size={24} />
-          </button>
         </div>
       )}
     </section>

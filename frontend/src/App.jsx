@@ -26,6 +26,7 @@ import Verifier from "./pages/verifier/Verifier.jsx";
 import RouteLink from "./components/RouteLink.jsx";
 import ThemeToggle from "./components/ThemeToggle.jsx";
 import Footer from "./components/Footer.jsx";
+import FarmerWelcomeModal from "./components/FarmerWelcomeModal.jsx";
 
 import "./App.css";
 
@@ -68,6 +69,18 @@ function App() {
   );
   const [user, setUser] = useState(readSavedUser);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const seen = sessionStorage.getItem("seva-welcome-seen");
+      if (!seen && !user && (pathname === "/" || pathname === "")) {
+        setWelcomeModalOpen(true);
+      }
+    } catch {
+      // Ignore sessionStorage errors
+    }
+  }, [user, pathname]);
 
   const navigate = useCallback((path, replace = false) => {
     const nextPath = normalizePath(path);
@@ -197,6 +210,17 @@ function App() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {/* Farmer Welcome Popup trigger button */}
+            <button
+              type="button"
+              onClick={() => setWelcomeModalOpen(true)}
+              className="farmer-nav-badge hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+              title="शेतकरी आहात? येथे सुरू करा / Farmer? Get Started"
+            >
+              <Sprout className="w-3.5 h-3.5" />
+              <span>Farmer? Get Started</span>
+            </button>
+
             <ThemeToggle />
 
             {/* Authenticated user vs Guest CTAs */}
@@ -312,6 +336,22 @@ function App() {
               <span>Contact Us</span>
             </RouteLink>
 
+            {/* Mobile Farmer Welcome Popup trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setWelcomeModalOpen(true);
+              }}
+              className="farmer-nav-badge w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-bold shadow-sm my-1"
+            >
+              <div className="flex items-center gap-2">
+                <Sprout className="w-4 h-4" />
+                <span>Farmer? Get Started</span>
+              </div>
+              <span className="text-xs bg-white/20 px-2 py-0.5 rounded-md">मदत / Help</span>
+            </button>
+
             <div className="pt-3 mt-2 border-t border-border flex flex-col gap-2">
               {user ? (
                 <>
@@ -391,6 +431,13 @@ function App() {
 
       {/* Global Comprehensive Site Footer */}
       <Footer onNavigate={navigate} />
+
+      {/* Multilingual Voice-First Farmer Welcome Modal */}
+      <FarmerWelcomeModal
+        isOpen={welcomeModalOpen}
+        onClose={() => setWelcomeModalOpen(false)}
+        onNavigate={navigate}
+      />
     </div>
   );
 }
