@@ -767,9 +767,17 @@ function RegisterFarmer({ onNavigate }) {
         result.message ||
           "Your registration and documents were submitted and are awaiting verification.",
       );
-    } catch {
+    } catch (err) {
+      console.error("Farmer registration submission error:", err);
       if (mountedRef.current && operationRef.current === operation) {
-        setStatus(languageConfig.saveFailed);
+        const isNetworkError =
+          err instanceof TypeError &&
+          (/fetch/i.test(err.message) || /network/i.test(err.message));
+        setStatus(
+          isNetworkError
+            ? `Unable to connect to backend server (${API_URL}). Please check that your backend is running and CORS/VITE_API_URL is configured.`
+            : languageConfig.saveFailed,
+        );
       }
       return;
     } finally {
