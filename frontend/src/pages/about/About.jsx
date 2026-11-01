@@ -53,21 +53,21 @@ const CORE_VALUES = [
 const DEVELOPERS = [
   {
     name: "Shreyansh Mojidra",
-    role: "Full-Stack Engineer & AI Voice Integration",
-    bio: "Passionate about building inclusive voice systems, scalable distributed architectures, and intuitive web experiences that bridge technology and grassroots community impact.",
+    role: "Full-Stack Engineer & Verification Systems",
+    bio: "Dedicated to designing resilient web applications, verifiable document workflows, and transparent donation pipelines that empower rural Indian farmers.",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
     initials: "SM",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
+    github: "https://github.com/Shrey1006",
+    linkedin: "https://www.linkedin.com/in/shreyansh-mojidra-8b2119252/",
   },
   {
     name: "Yash Deshmukh",
-    role: "Full-Stack Engineer & Verification Systems",
-    bio: "Dedicated to designing resilient web applications, verifiable document workflows, and transparent donation pipelines that empower rural Indian farmers.",
+    role: "Full-Stack Engineer & AI Voice Integration",
+    bio: "Passionate about building inclusive voice systems, scalable distributed architectures, and intuitive web experiences that bridge technology and grassroots community impact.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
     initials: "YD",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
+    github: "https://github.com/Yash-SD99",
+    linkedin: "https://www.linkedin.com/in/yash-deshmukh-5a1133378/",
   },
 ];
 
