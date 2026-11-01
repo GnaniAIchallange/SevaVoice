@@ -7,7 +7,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "seed": "node scripts/seed.js",
-    "test": "node --test src/routes/authRoutes.test.js src/routes/farmerRoutes.test.js src/routes/farmerWorkspaceRoutes.test.js src/routes/voiceRoutes.test.js src/services/voiceService.test.js src/services/requestExtractor.test.js src/routes/verifierRoutes.test.js src/routes/donorRoutes.test.js src/routes/adminRoutes.test.js"
+    "test": "node --test src/routes/authRoutes.test.js src/routes/farmerRoutes.test.js src/routes/farmerWorkspaceRoutes.test.js src/routes/voiceRoutes.test.js src/services/voiceService.test.js src/services/requestExtractor.test.js src/services/cloudinaryService.test.js src/routes/verifierRoutes.test.js src/routes/donorRoutes.test.js src/routes/adminRoutes.test.js"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.8",
     "express": "^5.3.0",

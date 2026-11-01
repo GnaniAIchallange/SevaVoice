@@ -12,6 +12,11 @@ const schema = z.object({
   GNANI_API_KEY: z.string().default(""),
   RAZORPAY_KEY_ID: z.string().default("rzp_test_sevavoice_placeholder"),
   RAZORPAY_KEY_SECRET: z.string().default("rzp_test_secret_placeholder"),
+  CLOUDINARY_CLOUD_NAME: z.string().default(""),
+  CLOUDINARY_API_KEY: z.string().default(""),
+  CLOUDINARY_API_SECRET: z.string().default(""),
+  CLOUDINARY_URL: z.string().default(""),
+  CLIENT_URL: z.string().default(""),
 });
 
 const result = schema.safeParse(process.env);

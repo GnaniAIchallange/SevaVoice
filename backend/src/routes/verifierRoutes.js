@@ -293,6 +293,21 @@ export function createVerifierRouter({
       const safeFilename = path.basename(document.storageKey);
       const filePath = path.join(storageDirectory, safeFilename);
 
+      if (document.url && (document.storageProvider === 'cloudinary' || !fs.existsSync(filePath))) {
+        try {
+          const remoteRes = await fetch(document.url);
+          if (remoteRes.ok) {
+            res.setHeader('Content-Type', document.mimeType || remoteRes.headers.get('content-type') || 'application/octet-stream');
+            res.setHeader('Content-Disposition', `inline; filename="${document.type}-${safeFilename}"`);
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            const buffer = Buffer.from(await remoteRes.arrayBuffer());
+            return res.send(buffer);
+          }
+        } catch (fetchErr) {
+          console.error('Error fetching remote document from Cloudinary:', fetchErr);
+        }
+      }
+
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ message: 'Physical document file not found on server' });
       }

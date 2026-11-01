@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { Document, User } from '../models/index.js';
 import FarmerRegistration from '../models/FarmerRegistration.js';
 import { DOCUMENT_STATUS, ROLES } from '../utils/constants.js';
+import { isCloudinaryEnabled, uploadDocument, deleteDocument } from '../services/cloudinaryService.js';
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const MAX_SUPPORTING_DOCUMENTS = 5;
@@ -324,6 +325,15 @@ export function createFarmerRouter({
       ];
 
       for (const { file, type } of documentFiles) {
+        let cloudResult = null;
+        if (isCloudinaryEnabled()) {
+          try {
+            cloudResult = await uploadDocument(file.path);
+          } catch (cloudErr) {
+            console.error('Cloudinary upload error:', cloudErr);
+          }
+        }
+
         const document = await DocumentModel.create({
           ownerId: farmer._id ?? farmer.id,
           type,
@@ -331,9 +341,23 @@ export function createFarmerRouter({
           mimeType: file.mimetype,
           size: file.size,
           verificationStatus: DOCUMENT_STATUS.PENDING,
+          ...(cloudResult
+            ? {
+                url: cloudResult.url,
+                publicId: cloudResult.publicId,
+                storageProvider: 'cloudinary',
+              }
+            : {
+                storageProvider: 'local',
+              }),
         });
         createdDocuments.push(document);
+
+        if (cloudResult) {
+          await unlink(file.path).catch(() => {});
+        }
       }
+
 
       await UserModel.updateOne(
         { _id: farmer._id ?? farmer.id },
@@ -347,6 +371,11 @@ export function createFarmerRouter({
     } catch (error) {
       if (farmer) {
         if (createdDocuments.length) {
+          for (const doc of createdDocuments) {
+            if (doc.publicId) {
+              await deleteDocument(doc.publicId).catch(() => {});
+            }
+          }
           await DocumentModel.deleteMany({
             _id: { $in: createdDocuments.map((document) => document._id ?? document.id) },
           });

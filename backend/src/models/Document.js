@@ -8,6 +8,9 @@ const documentSchema = new mongoose.Schema(
     storageKey: { type: String, required: true },
     mimeType: { type: String, required: true },
     size: { type: Number, required: true },
+    url: { type: String },
+    publicId: { type: String },
+    storageProvider: { type: String, enum: ['local', 'cloudinary'], default: 'local' },
 
     verificationStatus: {
       type: String,

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { authenticateToken } from "../middleware/authenticateToken.js";
 import { AssistanceRequest, Document, Donation, User } from "../models/index.js";
 import { extractAssistanceRequest } from "../services/requestExtractor.js";
+import { isCloudinaryEnabled, uploadDocument, deleteDocument } from "../services/cloudinaryService.js";
 import {
   DOCUMENT_STATUS,
   LANGUAGES,
@@ -569,6 +570,21 @@ export function createFarmerWorkspaceRouter({
         }
 
         await chmod(file.path, 0o600);
+
+        if (isCloudinaryEnabled()) {
+          try {
+            const cloudResult = await uploadDocument(file.path);
+            if (document.publicId) {
+              await deleteDocument(document.publicId).catch(() => {});
+            }
+            document.url = cloudResult.url;
+            document.publicId = cloudResult.publicId;
+            document.storageProvider = 'cloudinary';
+            await unlink(file.path).catch(() => {});
+          } catch (cloudErr) {
+            console.error('Cloudinary upload error during re-upload:', cloudErr);
+          }
+        }
 
         // Update the document record to pending
         document.storageKey = path.basename(file.filename);

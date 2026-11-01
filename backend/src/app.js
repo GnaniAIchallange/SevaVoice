@@ -12,17 +12,41 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
+const configuredOrigins = (process.env.CLIENT_URL || "")
   .split(",")
   .map((o) => o.trim().replace(/\/$/, ""))
   .filter(Boolean);
 
+const isDevelopment = process.env.NODE_ENV !== "production";
+
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+      // Allow requests with no origin (e.g. server-to-server, curl, tests)
+      if (!origin) return cb(null, true);
+
+      // Match explicit CLIENT_URL entries
+      if (configuredOrigins.includes(origin)) return cb(null, true);
+
+      // In local development or if CLIENT_URL is empty, allow localhost and loopback
+      if (
+        isDevelopment ||
+        configuredOrigins.length === 0 ||
+        /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
+        return cb(null, true);
+      }
+
+      // Allow Vercel deployments (production & branch preview URLs)
+      if (/\.vercel\.app$/.test(origin)) {
+        return cb(null, true);
+      }
+
       return cb(null, false);
     },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   })
 );
 app.use(express.json());

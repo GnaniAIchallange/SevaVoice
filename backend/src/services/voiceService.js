@@ -38,6 +38,7 @@ function isPlaceholderKey(value) {
 export function createVoiceService({
   apiKey = "",
   fetchImpl = fetch,
+  enableDiskCache = (fetchImpl === fetch),
 } = {}) {
   const key = String(apiKey).trim();
   const ttsCache = new Map();
@@ -105,12 +106,12 @@ export function createVoiceService({
       return cached;
     }
 
-    // 2. Check persistent disk cache
+    // 2. Check persistent disk cache (disabled for test mock runners)
     const diskFileName =
       crypto.createHash("md5").update(cacheKey).digest("hex") + ".wav";
     const diskFilePath = path.join(CACHE_DIR, diskFileName);
 
-    if (fs.existsSync(diskFilePath)) {
+    if (enableDiskCache && fs.existsSync(diskFilePath)) {
       try {
         const diskAudio = fs.readFileSync(diskFilePath);
         ttsCache.set(cacheKey, diskAudio);
@@ -181,8 +182,10 @@ export function createVoiceService({
             ttsCache.delete(oldestKey);
           }
 
-          // Save to persistent disk cache asynchronously
-          fs.writeFile(diskFilePath, audio, () => {});
+          // Save to persistent disk cache asynchronously if enabled
+          if (enableDiskCache) {
+            fs.writeFile(diskFilePath, audio, () => {});
+          }
 
           return audio;
         } catch (err) {
